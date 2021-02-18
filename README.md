@@ -15,8 +15,9 @@ Topics
 	    - This extracted information would provide more awareness to health care officials & make it easier for them to take appropriate actions in time.
 	    - Due to patient privacy & confidentiality, not much information about daily medical records is available to the public. So we create a dataset with randomized data to implement & test our algorithms.
 	
-      
-  
+#### 3.Unbiased news recommendation  
+  - Many of the news platforms these days include biased and one sided opinions, and in order to gain complete information and form unbiased opinions we need to view it from the maximum number of political lenses on a variety of platforms. Online recommendation systems are built around the idea of making recommendations 'similar' to a user's search interests. While this is helpul in most searches, news platforms should include 'similar' search recommendations as well as those putting up the opposite argument.
+Our system aims to use semantic analysis to provide an unbiased news recommendation feature that gauges user interest through the news links he visits, and makes recommendations so that he gets the complete picture. 
 
 
 
