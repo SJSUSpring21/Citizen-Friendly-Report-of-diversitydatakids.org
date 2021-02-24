@@ -1,7 +1,7 @@
 Topics
 =============
 
-## 1. Citizen friendly report of diversitydatakids.org
+## 1. Citizen friendly report of diversitydatakids.org - Approved
 ###   Abstract: 
 -   (idea#8) Using Divrsitykids datasets, create a dashboard and use NLG to generate a citizen friendly report.
 -   About Diversitydatakids.org: It is a research project that examines who our children are, whether they have what they need to grow up healthy and achieve their full potential, whether social policies are well designed to improve children’s lives and how to make them better to improve equity. 
