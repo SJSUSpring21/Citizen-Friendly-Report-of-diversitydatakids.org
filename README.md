@@ -21,20 +21,4 @@ Topics
 -   link: https://data.diversitydatakids.org/dataset
 -   Diversitydatakids.org contains datasets of over 320 socio-economic and policy indicators capturing a wide range of topics.
 
-## 2. Unbiased news recommendation  
-- Many of the news platforms these days include biased and one sided opinions, and in order to gain complete information and form unbiased opinions we need to view it from the maximum number of political lenses on a variety of platforms. Online recommendation systems are built around the idea of making recommendations 'similar' to a user's search interests. While this is helpul in most searches, news platforms should include 'similar' search recommendations as well as those putting up the opposite argument.
-Our system aims to use semantic analysis to provide an unbiased news recommendation feature that gauges user interest through the news links he visits, and makes recommendations so that he gets the complete picture. 
-
-
-## 3. Masters Admit Prediction App:
- ###    Abstract:
-  -  Lot of students have anxiety about whether they will make it to their dream university. Sometimes they underestimate themselves while at times they overestimate. Our goal is to provide a solution in the form of a web app where given a set of metrics such as gpa, gre etc the app can determine your chances of making it to the university. It also provides you with a list of universities under categories such as ambitious, moderate etc which you could potentially apply to.
- ###    Approach:
-  -  Will be developing a Web app where students would enter metrics such as gpa, gre etc. And Based on that the ML model would predict if the student could or could not
-  make it to his/her dream university. Also provide suggestions as to which other university could he/she aim for.
- ###    Dataset:
-  -  Kaggle: https://www.kaggle.com/hdarji/graduate-mis-student-data-yocketapp, more data for the same could be extracted via web scraping. 
-
-
-
 
