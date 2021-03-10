@@ -20,5 +20,5 @@ Topics
 ###   Datasets:
 -   link: https://data.diversitydatakids.org/dataset
 -   Diversitydatakids.org contains datasets of over 320 socio-economic and policy indicators capturing a wide range of topics.
-
-
+###   Project Architecture :
+[ProjectArchitecture.pdf](https://github.com/SJSUSpring21/Team6/files/6114048/ProjectArchitecture.pdf)
