@@ -16,7 +16,7 @@ router.get("/nationDisabilityText/:ethnicity", (req, res) => {
     .then((json) => {
       let res1 = "";
       //   console.log(json);
-      if (req.params.ethnicity === "asian") {
+      if (req.params.ethnicity === "black") {
         res1 = rosaenlgPug.renderFile("./routes/disability.pug", {
           language: "en_US",
           ethnicity: "Asian",
@@ -24,7 +24,7 @@ router.get("/nationDisabilityText/:ethnicity", (req, res) => {
         console.log(res1);
       }
       let asians = [];
-      if (req.params.ethnicity === "black") {
+      if (req.params.ethnicity === "asian") {
         // console.log(res1);
 
         for (let i = 0; i < json.result.records.length; i++) {
@@ -51,6 +51,33 @@ router.get("/nationDisabilityText/:ethnicity", (req, res) => {
 
       //   res.status(200).json({ text: json.result.records });
       res.status(200).json({ ans });
+    });
+});
+
+router.get("/nationDisabilityChart/:ethnicity", (req, res) => {
+  const result = fetch(
+    "https://data.diversitydatakids.org/api/3/action/datastore_search?resource_id=c3be7a68-8713-4700-9a64-0e9a7ccb013c&limit=5"
+  )
+    .then((result) => {
+      // console.log(result);
+      return result.json();
+    })
+    .then((json) => {
+      console.log(json);
+      let asians = [];
+      if (req.params.ethnicity === "asian") {
+        for (let i = 0; i < json.result.records.length; i++) {
+          let asianObj = {
+            ethnicity: "Asian",
+            year: json.result.records[i].year,
+            percent: json.result.records[i].asian_est,
+          };
+          asians.push(asianObj);
+        }
+        console.log(asians);
+
+        res.status(200).json(asians);
+      }
     });
 });
 
