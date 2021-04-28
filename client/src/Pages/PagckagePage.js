@@ -110,7 +110,7 @@ function PackagePage() {
         <FormControl>
           <TextField
             id="private-event-name"
-            label="Enter Resource ID"
+            label="Enter Dataset(package) ID"
             onChange={(e) => {
               setPackageId(e.target.value.trim());
             }}
@@ -126,7 +126,7 @@ function PackagePage() {
               fetchCkanData();
             }}
           >
-            Fetch resource data
+            Fetch Datasets
           </Button>
         </FormControl>
       </FormGroup>
@@ -151,7 +151,7 @@ function PackagePage() {
             setResourceMode(true);
           }}
         >
-          Generate Text for selected row
+          Show Tabular content
         </Button>
       </div>
     </div>
