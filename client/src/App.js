@@ -4,28 +4,14 @@ import { useState } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard/Dashboard";
 import NavigationBar from "./components/NavBar/NavBar";
+import PackagePage from "./Pages/PagckagePage";
 
 function App() {
-  const [content, setContent] = useState([]);
-  const [genText, setGenText] = useState([]);
-
-  const clickHandler = () => {
-    Axios.get("http://localhost:5000/click").then((result) =>
-      setContent(JSON.stringify(result.data.result))
-    );
-  };
-
-  const clickHandler2 = () => {
-    Axios.get("http://localhost:5000/").then((result) =>
-      setGenText(result.data)
-    );
-  };
-
   const DefaultContainer = () => (
     <div>
       <NavigationBar />
-
       <Route path="/" exact component={Dashboard} />
+      <Route path="/packages" exact component={PackagePage} />
     </div>
   );
 
