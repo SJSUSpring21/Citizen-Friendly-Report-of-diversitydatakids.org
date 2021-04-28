@@ -1,18 +1,28 @@
 import "./App.css";
-import ResourcePage from "./Pages/ResourcePage"
-import PackagePage from "./Pages/PagckagePage"
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Axios from "axios";
+import { useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Dashboard from "./components/Dashboard/Dashboard";
+import NavigationBar from "./components/NavBar/NavBar";
+import PackagePage from "./Pages/PagckagePage";
 
 function App() {
+  const DefaultContainer = () => (
+    <div>
+      <NavigationBar />
+      <Route path="/" exact component={Dashboard} />
+      <Route path="/packages" exact component={PackagePage} />
+    </div>
+  );
+
   return (
-      <Router>
+    <Router>
+      <div className="App">
         <Switch>
-          <Route path="/" exact render={(props) => <PackagePage></PackagePage>} />
-          <Route path="/resource" exact render={(props) => <ResourcePage />} />
-          <Route path="*">
-          </Route>
+          <Route component={DefaultContainer} />
         </Switch>
-      </Router>
+      </div>
+    </Router>
   );
 }
 
