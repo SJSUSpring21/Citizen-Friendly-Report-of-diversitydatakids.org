@@ -1,17 +1,9 @@
 import Axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import jsonp from "jsonp";
 import { DataGrid, GridToolbar } from "@material-ui/data-grid";
-import {
-  Button,
-  FormControl,
-  FormGroup,
-  Snackbar,
-  Typography,
-} from "@material-ui/core";
+import { Button, FormControl, FormGroup, Snackbar, Typography } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
-import ReactDataGrid from "@inovua/reactdatagrid-community";
-import "@inovua/reactdatagrid-community/index.css";
 
 function ResourcePage(props) {
   const [genText, setGenText] = useState([]);
@@ -25,12 +17,11 @@ function ResourcePage(props) {
   const [columns, setColumns] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [rowCount, setRowCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [sortModel, setSortModel] = useState();
+  const [limit, setLimit] = useState(10);
   const [gridData, setGridData] = useState({});
   const [columnMap, setColumnMap] = useState({});
-  const gridStyle = {}
-  const [selected, setSelected] = useState({});
 
   let myUrl = "";
 
@@ -41,7 +32,7 @@ function ResourcePage(props) {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     myUrl = new URL(base);
-    myUrl.searchParams.append("limit", pageSize);
+    myUrl.searchParams.append("limit", limit);
     myUrl.searchParams.append("resource_id", resourceId);
   };
   const fetchCkanData = () => {
@@ -70,24 +61,34 @@ function ResourcePage(props) {
             })
             .map((field) => {
               if (field.info) {
+                // label = field.info.label.split(";")[1];
                 label = field.id;
-                if (field.info.label.includes(";")) {
-                  columnMap[field.id] = {title: field.info.label.split(";")[1], visible:true}
-                }else{ 
-                  columnMap[field.id] = {title: field.info.label, visible:true}
-                }
+                // if (!label) {
+                //   label = field.info.label;
+                // }
+                setColumnMap((old) => {
+                  if (field.info.label.includes(";")) {
+                    return {
+                      ...old,
+                      [field.id]: field.info.label.split(";")[1],
+                    };
+                  } else {
+                    return { ...old, [field.id]: field.info.label };
+                  }
+                });
                 return {
-                  name: field.id,
-                  header: label,
-                  minWidth: 150,
+                  field: field.id,
+                  headerName: label,
+                  width: 150,
                 };
               } else {
-                columnMap.id = {title:"id",visible:true}
-                return { name: field.id, header: "id", hide: true };
+                setColumnMap((old) => {
+                  return { ...old, id: "id" };
+                });
+                return { field: field.id, headerName: "id", hide:true };
               }
             })
         );
-        setColumnMap(columnMap);
         setRows(res.result.records);
         setLoading(false);
       }
@@ -102,15 +103,6 @@ function ResourcePage(props) {
     }
     setWarning(false);
   };
-  const onSelectionChange = useCallback(({ selected: selectedMap, data }) => {
-    setRowData(data[0])
-  }, [])
-  const onColumnVisibleChange = (column) => {
-    setColumnMap((old)=>{
-      old[column.column.name].visible = column.visible;
-      return old;
-    })
-  }
   return (
     <div className="App">
       <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
@@ -122,31 +114,47 @@ function ResourcePage(props) {
         {displayData.title}
       </Typography>
       <div style={{ height: 400, width: "100%" }}>
-        <ReactDataGrid
-          idProperty="id"
+        <DataGrid
+          rows={rows}
           columns={columns}
-          dataSource={rows}
-          style={gridStyle}
           loading={loading}
-          onSelectionChange ={onSelectionChange}
-          onColumnVisibleChange={onColumnVisibleChange}
-          selected = {selected}
-          pagination = "remote"
-          limit={pageSize}
+          getRowId={(row) => row._id}
+          // navigation
+          pagination
+          pageSize={pageSize}
+          rowCount={rowCount}
+          paginationMode="server"
+          rowsPerPageOptions={[5, 10, 20, 50, 100]}
+          onPageChange={(params) => {
+            updateRows(params);
+          }}
+          onPageSizeChange={(params) => {
+            updateRows(params);
+          }}
+          //sorting
+          sortingMode="server"
+          sortModel={sortModel}
+          onSortModelChange={updateRows}
+          //filters
+          filterMode="server"
+          onFilterModelChange={updateRows}
+          components={{
+            Toolbar: GridToolbar,
+          }}
+          onRowSelected={(rowData) => {
+            setRowData(rowData);
+          }}
         />
-      </div>
-      <div style={{ height: 400, width: "100%" }}>
         <Button
           style={{ margin: "8px", display: "block", marginLeft: "auto" }}
           variant="contained"
           color="primary"
-          disabled={(Object.keys(rowData).length === 0)}
+          disabled={!(rowData && rowData.isSelected)}
           onClick={() => {
             console.log({
               NLGData: NLGData,
               columnMap: columnMap,
-              rowData: rowData,
-              columns: columns
+              rowData: rowData.data,
             });
           }}
         >

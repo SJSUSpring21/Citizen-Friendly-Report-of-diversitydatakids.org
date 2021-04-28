@@ -1,7 +1,7 @@
-import Axios from "axios";
+
 import { useState } from "react";
 import jsonp from "jsonp";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+import { DataGrid,} from "@material-ui/data-grid";
 import {
   Button,
   FormControl,
@@ -96,7 +96,17 @@ function PackagePage() {
   };
   if(resourceMode){
     return <div>
-      <ResourcePage data={{NLGData: packageNLGData, resourceId: rowData.data.id }}></ResourcePage>
+      <Button
+          style={{ margin: "8px", display: "block", marginRight: "auto" }}
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            setResourceMode(false);
+          }}
+        >
+          Go back
+        </Button>
+      <ResourcePage data={{NLGData: packageNLGData, resourceId: rowData.data.id, displayData:packageDisplayData }}></ResourcePage>
     </div>
   }
   return (
