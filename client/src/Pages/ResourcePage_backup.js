@@ -72,12 +72,10 @@ function ResourcePage() {
   return (
     <div className="App">
       <button id="test1" onClick={clickHandler}>
-        {" "}
-        CKAN{" "}
+        CKAN
       </button>
       <button id="test1" onClick={clickHandler2}>
-        {" "}
-        Rosa Tut{" "}
+        Rosa Tut
       </button>
       <div>{genText}</div>
       <div style={{ height: 400, width: "100%" }}>
