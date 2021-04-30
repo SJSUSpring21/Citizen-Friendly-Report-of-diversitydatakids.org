@@ -1,0 +1,34 @@
+mixin listRaces  
+    | the available races are 
+    eachz test in Object.keys(map) with {separator:',', last_separator:'and', end:'.'}
+        | #{map[test].title.replace(" Alone","")}
+mixin intro
+    synz
+        syn
+            | In the year
+        syn     
+            | During the year
+        syn 
+            | Around the year
+    | #{rowData.year}
+    | in the #{rowData.name} 
+
+mixin header 
+    | #{NLG.Title}
+
+mixin max 
+    | #community# has recorded the lowest #{NLG.Scale[0]} of #count# .
+mixin min 
+    | #community# has recorded the highest #{NLG.Scale[0]} of #count# .
+
+mixin rest
+    | Of the remaining races #race# has #count# 
+mixin total
+    | the  #{NLG.Scale[0]} of #[+header] are #{rowData.total_est}
+p
+    | #[+intro]
+    | #[+total] . 
+    | Out of which 
+    | #[+max]
+    | #[+min]
+    | #[+rest]

@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard/Dashboard";
 import NavigationBar from "./components/NavBar/NavBar";
 import PackagePage from "./Pages/PagckagePage";
+import ResourcePage from "./Pages/ResourcePage";
 
 function App() {
   const DefaultContainer = () => (

@@ -18,6 +18,7 @@ function ResourcePage(props) {
   // const [resourceID, setResourceId] = useState(
   //   "61430b80-e431-4db0-a7f1-490ec1c9a7d8"
   // );
+  
   const { resourceId, NLGData, displayData } = props.data;
   const [warning, setWarning] = useState(false);
   const [rowData, setRowData] = useState({});
@@ -31,7 +32,7 @@ function ResourcePage(props) {
   const [columnMap, setColumnMap] = useState({});
   const gridStyle = {}
   const [selected, setSelected] = useState({});
-
+  const [message, setMessage] = useState("");
   let myUrl = "";
 
   useEffect(() => {
@@ -82,7 +83,7 @@ function ResourcePage(props) {
                   minWidth: 150,
                 };
               } else {
-                columnMap.id = {title:"id",visible:true}
+                columnMap[field.id] = {title:"id",visible:true}
                 return { name: field.id, header: "id", hide: true };
               }
             })
@@ -121,7 +122,7 @@ function ResourcePage(props) {
       <Typography variant="h4" gutterBottom>
         {displayData.title}
       </Typography>
-      <div style={{ height: 400, width: "100%" }}>
+      <div >
         <ReactDataGrid
           idProperty="id"
           columns={columns}
@@ -135,7 +136,7 @@ function ResourcePage(props) {
           limit={pageSize}
         />
       </div>
-      <div style={{ height: 400, width: "100%" }}>
+      <div>
         <Button
           style={{ margin: "8px", display: "block", marginLeft: "auto" }}
           variant="contained"
@@ -148,11 +149,23 @@ function ResourcePage(props) {
               rowData: rowData,
               columns: columns
             });
+            Axios.post("http://localhost:5000/getRowText",{
+              NLGData: NLGData,
+              columnMap: columnMap,
+              rowData: rowData,
+              columns: columns
+            }).then((result)=>{
+              setMessage(result.data);
+            }).catch((error)=>{
+
+            })
           }}
         >
           Generate Text for selected row
         </Button>
+        <div>{message}</div>
       </div>
+      
     </div>
   );
 }
