@@ -104,7 +104,17 @@ function ResourcePage(props) {
     setWarning(false);
   };
   const onSelectionChange = useCallback(({ selected: selectedMap, data }) => {
-    setRowData(data[0])
+    setRowData(data[0]);
+    Axios.post("http://localhost:5000/getRowText",{
+              NLGData: NLGData,
+              columnMap: columnMap,
+              rowData: rowData,
+              columns: columns
+            }).then((result)=>{
+              setMessage(result.data);
+            }).catch((error)=>{
+
+            })
   }, [])
   const onColumnVisibleChange = (column) => {
     setColumnMap((old)=>{
@@ -149,16 +159,7 @@ function ResourcePage(props) {
               rowData: rowData,
               columns: columns
             });
-            Axios.post("http://localhost:5000/getRowText",{
-              NLGData: NLGData,
-              columnMap: columnMap,
-              rowData: rowData,
-              columns: columns
-            }).then((result)=>{
-              setMessage(result.data);
-            }).catch((error)=>{
-
-            })
+            
           }}
         >
           Generate Text for selected row
