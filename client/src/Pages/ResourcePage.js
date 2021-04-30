@@ -108,7 +108,7 @@ function ResourcePage(props) {
     Axios.post("http://localhost:5000/getRowText",{
               NLGData: NLGData,
               columnMap: columnMap,
-              rowData: rowData,
+              rowData: data[0],
               columns: columns
             }).then((result)=>{
               setMessage(result.data);
