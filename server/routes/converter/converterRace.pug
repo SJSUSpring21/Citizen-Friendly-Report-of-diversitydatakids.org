@@ -4,9 +4,13 @@
 //-         | #{map[test].title.replace(" Alone","")}
 include synonyms
 
+mixin percent 
+    if(NLG.Scale[0] === 'Percent')
+        |%
+
 mixin intro
     | In the #{info.name.data} 
-    if(!info.year.data.includes("-"))
+    if(info.year.data.includes("-"))
         | #[+multiYear]
     else 
         | #[+singleYear]
@@ -24,8 +28,7 @@ mixin min
     else
         | has
     | #[+recorded] the lowest value of #{min} 
-    if(NLG.Scale[0] === 'Percent')
-        | %
+    | #[+percent]
     | .
 
 mixin max 
@@ -36,8 +39,7 @@ mixin max
     else
         | has
     | #[+recorded] the highest value of #{max} 
-    if(NLG.Scale[0] === 'Percent')
-        | %
+    | #[+percent]
     | .
 
 mixin minMax 
@@ -49,8 +51,7 @@ mixin minMax
     else
         | has
     | #[+recorded] the values of #{max} 
-    if(NLG.Scale[0] === 'Percent')
-        | %
+    | #[+percent]
     | .
 
 mixin rest
@@ -58,12 +59,7 @@ mixin rest
 
 mixin total
     | the total #{NLG.Scale[0]} of #[+header] 
-    if(NLG.Scale[0] === 'Percent')
-        | is 
-        | #{info.total_est.data}%
-    else 
-        | are
-        | #{info.total_est.data}
+    | is #{info.total_est.data} #[+percent]
 
 mixin zero 
     | For the 
@@ -72,16 +68,24 @@ mixin zero
     | entries in the dataset are #[+recorded] as 0. 
 
 mixin unknown 
-    | For the 
+    | Entries in the dataset are #[+recorded] as null   
+    | for the [
     eachz el in unknownArray with {separator:',', last_separator:'and'}
          | #{el}
-    | entries in the dataset are #[+recorded] as null. 
+    | ] 
+    if(unknownArray.length > 1)
+        | communities 
+    else 
+        | community
 
+mixin avg 
+    | with #[+anAverage] value of #{avg}
 //- ----------------------------------
 
 p
     | #[+intro]
-    | #[+total] . 
+    | #[+total]
+    | #[+avg].
     if((minArray && minArray.length > 0) || (maxArray && maxArray.length > 0) && min !== max )
         if(maxArray && maxArray.length > 0)
             | #[+AmongThem]
@@ -91,10 +95,11 @@ p
             | #[+min]
     if(minArray && maxArray && min === max)
         | #[+minMax]
-    if(zeroArray && zeroArray.length>0)
-        | #[+zero]
-    if(unknownArray && unknownArray.length>0)
-        | #[+unknown]
+    
+    //- if(zeroArray && zeroArray.length>0)
+    //-     | #[+zero]
+    //- if(unknownArray && unknownArray.length>0)
+    //-     | #[+unknown]
         
         
 //- | #[+rest]
