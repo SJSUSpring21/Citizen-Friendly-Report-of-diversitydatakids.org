@@ -192,7 +192,7 @@ function ResourcePage(props) {
             let graphData = [];
             for (var key of Object.keys(data[0])) {
               console.log(key + " -> " + data[0][key]);
-              if (key.includes("_se") && !key.includes("total_se")) {
+              if (key.includes("_est") && !key.includes("total_est")) {
                 console.log("inside", key + " -> " + data[0][key]);
                 graphData.push({ key: key, ethnicity: data[0][key] });
               }
