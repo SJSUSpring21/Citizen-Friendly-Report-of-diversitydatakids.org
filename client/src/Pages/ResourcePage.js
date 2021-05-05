@@ -269,24 +269,8 @@ function ResourcePage(props) {
           // limit={pageSize}
         />
       </div>
-      <div>
-        {/* <Button
-          style={{ margin: "8px", display: "block", marginLeft: "auto" }}
-          variant="contained"
-          color="primary"
-          disabled={Object.keys(rowData).length === 0}
-          onClick={() => {
-            console.log({
-              NLGData: NLGData,
-              columnMap: columnMap,
-              rowData: rowData,
-              columns: columns,
-            });
-          }}
-        >
-          Get Insights
-        </Button> */}
-
+      <div style={{display:"flex"}}>
+        <div>
         {message.length && (
           <React.Fragment>
             <div className={classes.root}>
@@ -381,7 +365,7 @@ function ResourcePage(props) {
             </Container>
           </React.Fragment>
         )}
-
+        </div>
         <div>{message}</div>
       </div>
     </div>
