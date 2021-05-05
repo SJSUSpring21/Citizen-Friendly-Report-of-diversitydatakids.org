@@ -2,47 +2,14 @@
 //-     | the available races are 
 //-     eachz test in Object.keys(map) with {separator:',', last_separator:'and', end:'.'}
 //-         | #{map[test].title.replace(" Alone","")}
-mixin race 
-    synz 
-        syn     
-            | race 
-        syn 
-            | community 
-        syn     
-            | ethnicity
-        syn    
-            | population
-mixin recorded 
-    synz 
-        syn     
-            | recorded 
-        syn 
-            | registered
-mixin AmongThem
-    synz
-        syn 
-            | Among them,
-        syn 
-            | In that,
-        syn 
-            | Out of which,
+include synonyms
 
 mixin intro
     | In the #{info.name.data} 
     if(!info.year.data.includes("-"))
-        synz
-            syn
-                | for the year
-            syn     
-                | during 
-            syn 
-                | around
+        | #[+multiYear]
     else 
-        synz
-            syn
-                | in between the years
-            syn     
-                | during the period
+        | #[+singleYear]
     | #{info.year.data}
     
 
@@ -98,7 +65,20 @@ mixin total
         | are
         | #{info.total_est.data}
 
+mixin zero 
+    | For the 
+    eachz el in zeroArray with {separator:',', last_separator:'and'}
+         | #{el}
+    | entries in the dataset are #[+recorded] as 0. 
+
+mixin unknown 
+    | For the 
+    eachz el in unknownArray with {separator:',', last_separator:'and'}
+         | #{el}
+    | entries in the dataset are #[+recorded] as null. 
+
 //- ----------------------------------
+
 p
     | #[+intro]
     | #[+total] . 
@@ -111,6 +91,10 @@ p
             | #[+min]
     if(minArray && maxArray && min === max)
         | #[+minMax]
+    if(zeroArray && zeroArray.length>0)
+        | #[+zero]
+    if(unknownArray && unknownArray.length>0)
+        | #[+unknown]
         
         
 //- | #[+rest]

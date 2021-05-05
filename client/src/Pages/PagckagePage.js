@@ -149,7 +149,6 @@ function PackagePage() {
           pageSize={20}
           onRowSelected={(rowData) => {
             setRowData(rowData);
-            console.log(rowData)
           }}
         />
         <Button

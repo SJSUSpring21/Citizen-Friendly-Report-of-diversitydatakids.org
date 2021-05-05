@@ -126,6 +126,7 @@ function ResourcePage(props) {
   };
 
   const onSelectionChange = useCallback(({ selected: selectedMap, data }) => {
+    console.log("test");
     setRowData(data[0]);
     for (const [key, value] of Object.entries(infoMap)) {
       value.data = data[0][key];
@@ -150,7 +151,7 @@ function ResourcePage(props) {
     } else {
       setMessage("NLG is not supported for this kind of dataset");
     }
-  }, []);
+  }, [supported,NLGData,infoMap,visibleMap]);
 
   const onColumnVisibleChange = (data) => {
     setColumnMap((old) => {
