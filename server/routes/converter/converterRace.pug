@@ -1,34 +1,110 @@
-mixin listRaces  
-    | the available races are 
-    eachz test in Object.keys(map) with {separator:',', last_separator:'and', end:'.'}
-        | #{map[test].title.replace(" Alone","")}
-mixin intro
-    synz
-        syn
-            | In the year
+//- mixin listRaces  
+//-     | the available races are 
+//-     eachz test in Object.keys(map) with {separator:',', last_separator:'and', end:'.'}
+//-         | #{map[test].title.replace(" Alone","")}
+mixin race 
+    synz 
         syn     
-            | During the year
+            | race 
         syn 
-            | Around the year
-    | #{rowData.year}
-    | in the #{rowData.name} 
+            | community 
+        syn     
+            | ethnicity
+        syn    
+            | population
+mixin recorded 
+    synz 
+        syn     
+            | recorded 
+        syn 
+            | registered
+mixin AmongThem
+    synz
+        syn 
+            | Among them,
+        syn 
+            | In that,
+        syn 
+            | Out of which,
+
+mixin intro
+    | In the #{info.name.data} 
+    if(!info.year.data.includes("-"))
+        synz
+            syn
+                | for the year
+            syn     
+                | during 
+            syn 
+                | around
+    else 
+        synz
+            syn
+                | in between the years
+            syn     
+                | during the period
+    | #{info.year.data}
+    
 
 mixin header 
     | #{NLG.Title}
 
-mixin max 
-    | #community# has recorded the lowest #{NLG.Scale[0]} of #count# .
 mixin min 
-    | #community# has recorded the highest #{NLG.Scale[0]} of #count# .
+    eachz el in minArray with {separator:',', last_separator:'and'}
+         | #{el}
+    if(minArray.length > 1)
+        | have 
+    else
+        | has
+    | #[+recorded] the lowest value of #{min} 
+    if(NLG.Scale[0] === 'Percent')
+        | %
+    | .
+
+mixin max 
+    eachz el in maxArray with {separator:',', last_separator:'and'}
+         | #{el}
+    if(maxArray.length > 1)
+        | have 
+    else
+        | has
+    | #[+recorded] the highest value of #{max} 
+    if(NLG.Scale[0] === 'Percent')
+        | %
+    | .
+
+mixin minMax 
+    | The
+    eachz el in minArray with {separator:',', last_separator:'and'}
+         | #{el}
+    if(minArray.length > 1)
+        | have 
+    else
+        | has
+    | #[+recorded] the values of #{max} 
+    if(NLG.Scale[0] === 'Percent')
+        | %
+    | .
 
 mixin rest
     | Of the remaining races #race# has #count# 
+
 mixin total
-    | the  #{NLG.Scale[0]} of #[+header] are #{rowData.total_est}
+    | the total #{NLG.Scale[0]} of #[+header] are #{info.total_est.data}
+
+//- ----------------------------------
 p
     | #[+intro]
     | #[+total] . 
-    | Out of which 
-    | #[+max]
-    | #[+min]
-    | #[+rest]
+    if(minArray.length > 0 || maxArray.length > 0 & min !== max )
+        if(maxArray.length > 0)
+            | #[+AmongThem]
+            | #[+max]
+        if(minArray.length > 0)
+            | Whereas
+            | #[+min]
+    if(min === max)
+        | #[+minMax]
+        
+        
+//- | #[+rest]

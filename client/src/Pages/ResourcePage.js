@@ -1,11 +1,8 @@
 import Axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import jsonp from "jsonp";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
 import {
   Button,
-  FormControl,
-  FormGroup,
   Snackbar,
   Typography,
 } from "@material-ui/core";
@@ -14,25 +11,20 @@ import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 
 function ResourcePage(props) {
-  const [genText, setGenText] = useState([]);
-  // const [resourceID, setResourceId] = useState(
-  //   "61430b80-e431-4db0-a7f1-490ec1c9a7d8"
-  // );
-  
   const { resourceId, NLGData, displayData } = props.data;
   const [warning, setWarning] = useState(false);
   const [rowData, setRowData] = useState({});
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
   const [pageSize, setPageSize] = useState(10);
-  const [rowCount, setRowCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [sortModel, setSortModel] = useState();
-  const [gridData, setGridData] = useState({});
   const [columnMap, setColumnMap] = useState({});
-  const gridStyle = {}
+  const [visibleMap, setVisibleMap] = useState({});
+  const [infoMap, setInfoMap] = useState({});
+  const gridStyle = {};
   const [selected, setSelected] = useState({});
   const [message, setMessage] = useState("");
+  const [supported, setSupported] = useState(false);
   let myUrl = "";
 
   useEffect(() => {
@@ -73,9 +65,15 @@ function ResourcePage(props) {
               if (field.info) {
                 label = field.id;
                 if (field.info.label.includes(";")) {
-                  columnMap[field.id] = {title: field.info.label.split(";")[1], visible:true}
-                }else{ 
-                  columnMap[field.id] = {title: field.info.label, visible:true}
+                  columnMap[field.id] = {
+                    title: field.info.label.split(";")[1],
+                    visible: true,
+                  };
+                } else {
+                  columnMap[field.id] = {
+                    title: field.info.label,
+                    visible: true,
+                  };
                 }
                 return {
                   name: field.id,
@@ -83,11 +81,12 @@ function ResourcePage(props) {
                   minWidth: 150,
                 };
               } else {
-                columnMap[field.id] = {title:"id",visible:true}
+                columnMap[field.id] = { title: "id", visible: true };
                 return { name: field.id, header: "id", hide: true };
               }
             })
         );
+        setVisibleData(columnMap);
         setColumnMap(columnMap);
         setRows(res.result.records);
         setLoading(false);
@@ -95,7 +94,29 @@ function ResourcePage(props) {
     });
   };
 
-  const updateRows = (params) => {};
+  const setVisibleData = (columnMap) => {
+    // let data = {}, info = {};
+    for (const [key, value] of Object.entries(columnMap)) {
+      if (
+        key === "_id" ||
+        key === "name" ||
+        key === "geoid" ||
+        key === "year" ||
+        key === "total_est"
+      ) {
+        infoMap[key] = { title: value.title };
+      } else {
+        visibleMap[key] = { title: value.title };
+      }
+    }
+    if (infoMap.total_est) {
+      setSupported(true);
+    } else {
+      setSupported(false);
+    }
+    setVisibleMap(visibleMap);
+    setInfoMap(infoMap);
+  };
 
   const closeWarning = (event, reason) => {
     if (reason === "clickaway") {
@@ -103,25 +124,49 @@ function ResourcePage(props) {
     }
     setWarning(false);
   };
+
   const onSelectionChange = useCallback(({ selected: selectedMap, data }) => {
     setRowData(data[0]);
-    Axios.post("http://localhost:5000/getRowText",{
-              NLGData: NLGData,
-              columnMap: columnMap,
-              rowData: data[0],
-              columns: columns
-            }).then((result)=>{
-              setMessage(result.data);
-            }).catch((error)=>{
+    for (const [key, value] of Object.entries(infoMap)) {
+      value.data = data[0][key];
+      infoMap[key] = value;
+    }
+    setInfoMap(infoMap);
+    for (const [key, value] of Object.entries(visibleMap)) {
+      value.data = data[0][key];
+      visibleMap[key] = value;
+    }
+    setVisibleMap(visibleMap);
+    if (supported) {
+      Axios.post("http://localhost:5000/getRowText", {
+        NLGData: NLGData,
+        info: infoMap,
+        data: visibleMap,
+      })
+        .then((result) => {
+          setMessage(result.data);
+        })
+        .catch((error) => {});
+    } else {
+      setMessage("NLG is not supported for this kind of dataset");
+    }
+  }, []);
 
-            })
-  }, [])
-  const onColumnVisibleChange = (column) => {
-    setColumnMap((old)=>{
-      old[column.column.name].visible = column.visible;
+  const onColumnVisibleChange = (data) => {
+    setColumnMap((old) => {
+      old[data.column.name].visible = data.visible;
       return old;
-    })
-  }
+    });
+    setVisibleMap((old) => {
+      if (data.visible) {
+        if (!old[data.column.name]) {
+          old[data.column.name] = { title: columnMap[data.column.name].title };
+        }
+      } else {
+        delete old[data.column.name];
+      }
+    });
+  };
   return (
     <div className="App">
       <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
@@ -132,18 +177,19 @@ function ResourcePage(props) {
       <Typography variant="h4" gutterBottom>
         {displayData.title}
       </Typography>
-      <div >
+      <div>
         <ReactDataGrid
-          idProperty="id"
+          idProperty="_id"
           columns={columns}
           dataSource={rows}
           style={gridStyle}
           loading={loading}
-          onSelectionChange ={onSelectionChange}
+          onSelectionChange={onSelectionChange}
           onColumnVisibleChange={onColumnVisibleChange}
-          selected = {selected}
-          pagination = "remote"
-          limit={pageSize}
+          selected={selected}
+          pagination
+          // pagination="remote"
+          // limit={pageSize}
         />
       </div>
       <div>
@@ -151,22 +197,20 @@ function ResourcePage(props) {
           style={{ margin: "8px", display: "block", marginLeft: "auto" }}
           variant="contained"
           color="primary"
-          disabled={(Object.keys(rowData).length === 0)}
+          disabled={Object.keys(rowData).length === 0}
           onClick={() => {
             console.log({
               NLGData: NLGData,
               columnMap: columnMap,
               rowData: rowData,
-              columns: columns
+              columns: columns,
             });
-            
           }}
         >
           Generate Text for selected row
         </Button>
-        <div>{message}</div>
+        <div>{message} </div>
       </div>
-      
     </div>
   );
 }
