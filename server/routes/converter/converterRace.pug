@@ -90,20 +90,26 @@ mixin rest
     | Of the remaining races #race# has #count# 
 
 mixin total
-    | the total #{NLG.Scale[0]} of #[+header] are #{info.total_est.data}
+    | the total #{NLG.Scale[0]} of #[+header] 
+    if(NLG.Scale[0] === 'Percent')
+        | is 
+        | #{info.total_est.data}%
+    else 
+        | are
+        | #{info.total_est.data}
 
 //- ----------------------------------
 p
     | #[+intro]
     | #[+total] . 
-    if(minArray.length > 0 || maxArray.length > 0 & min !== max )
-        if(maxArray.length > 0)
+    if((minArray && minArray.length > 0) || (maxArray && maxArray.length > 0) && min !== max )
+        if(maxArray && maxArray.length > 0)
             | #[+AmongThem]
             | #[+max]
-        if(minArray.length > 0)
+        if(minArray && minArray.length > 0)
             | Whereas
             | #[+min]
-    if(min === max)
+    if(minArray && maxArray && min === max)
         | #[+minMax]
         
         
