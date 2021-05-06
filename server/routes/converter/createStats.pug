@@ -14,11 +14,9 @@ p
     | the #[+Average] no of 
     | #{NLG.Title}
     | is 
-    | #{Math.round(stats.avg)} #[+percent]
+    | #{parseFloat(stats.avg).toFixed(2)} #[+percent]
     | and
     | the #[+highest] value ever #[+recorded] was 
-    | #{Math.round(stats.max)}  #[+percent], 
+    | #{parseFloat(stats.max).toFixed(2)}  #[+percent], 
     | whereas the #[+lowest] value to ever #[+record] was 
-    | #{Math.round(stats.min)}  #[+percent]
-    
-    
+    | #{parseFloat(stats.min).toFixed(2)}  #[+percent]

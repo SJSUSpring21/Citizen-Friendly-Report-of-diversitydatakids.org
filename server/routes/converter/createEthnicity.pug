@@ -85,15 +85,15 @@ mixin avg
         | with #[+anAverage] value of #{avg} for #[+different] #[+races]
 
 mixin compare 
-    if(stats && stats.avg !== -1)
+    if(stats && stats.avg !== -1 && (info.total_est.data !== null))
         if(info.total_est.data > stats.avg)
-            | this #{NLG.Scale[0]} is #[+greater] than the #[+records] #[+Average]
-            | by a value of #{info.total_est.data - Math.round(stats.avg)}.
+            | this #{NLG.Scale[0]} is #[+greater] than the #{resourceName.split("(")[0]} #[+Average]
+            | by a value of #{parseFloat(info.total_est.data - stats.avg).toFixed(2)} #[+percent].
         if(info.total_est.data < stats.avg)
-            | this #{NLG.Scale[0]} is #[+lower] than the #[+records] #[+Average]
-            | by a value of #{Math.round(stats.avg) - info.total_est.data}.
+            | this #{NLG.Scale[0]} is #[+lower] than the #{resourceName.split("(")[0]} #[+Average]
+            | by a value of #{parseFloat(stats.avg - info.total_est.data).toFixed(2)} #[+percent].
         else 
-            | this #{NLG.Scale[0]} is same as the #[+records] #[+Average].
+            | this #{NLG.Scale[0]} is same as the #{resourceName.split("(")[0]} #[+Average].
 
 //- ----------------------------------
 

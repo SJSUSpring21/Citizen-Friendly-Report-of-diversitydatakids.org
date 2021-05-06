@@ -72,12 +72,13 @@ function ResourcePage(props) {
     avg: -1,
   });
   const [overview, setOverview] = useState("");
+  const [ethnicStats, setEthnicStats] = useState("");
   let myUrl = "";
 
   useEffect(() => {
     fetchFilterData();
     fetchStatistics();
-    // fetchCkanData();
+    fetchEthnicStats();
   }, [props]);
 
   const createUrlFilters = () => {
@@ -119,15 +120,11 @@ function ResourcePage(props) {
         setLoading(false);
         return;
       } else {
-        console.log(res.result.records);
         let name_filter = res.result.records.map((record) => {
           return record.name;
         });
-
         setName(name_filter[0]);
         fetchCkanData(name_filter[0]);
-
-        console.log(name_filter);
         setNameFilter(name_filter);
       }
     });
@@ -158,7 +155,6 @@ function ResourcePage(props) {
       }
     });
   };
-
   const createUrl_sql = (filter) => {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search_sql";
@@ -169,13 +165,71 @@ function ResourcePage(props) {
     );
   };
 
+  const fetchEthnicStats = () => {
+    const base =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search";
+    let url = new URL(base);
+    let titles = {};
+    url.searchParams.append("limit", 0);
+    url.searchParams.append("resource_id", resourceId);
+    jsonp(url.toString(), null, function (err, res) {
+      if (err) {
+        setWarning(true);
+      } else {
+        let stats = res.result.fields
+          .filter((each) => {
+            if (
+              (!each.info ||
+                !each.info.notes.includes(
+                  "(only available in download file)"
+                )) &&
+              each.type === "numeric" &&
+              each.id !== "total_est"
+            ) {
+              return true;
+            }
+          })
+          .map((each) => {
+            titles[each.id] = each.info.label.split(";")[1] ? each.info.label.split(";")[1] : each.info.label.split(";")[0];
+            return "avg(" + each.id + ") as avg_" + each.id;
+          })
+          .join();
+        if (stats.length > 0) {
+          let url =
+            "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
+            stats +
+            ' from "' +
+            resourceId +
+            '"';
+          jsonp(url, null, function (err, res) {
+            if (err) {
+              setWarning(true);
+            } else {
+              if(res.success){
+                let data = res.result.records[0];
+                Axios.post("http://localhost:5000/getEthnicStats", {
+                  NLGData: NLGData,
+                  data: data,
+                  titles:titles,
+                }).then((result) => {
+                  setEthnicStats(result.data);
+                }).catch((error)=>{
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  };
+
   const fetchCkanData = (filter) => {
     if (resourceId === "") {
       setWarning(true);
       return;
     }
     createUrl(filter);
-    setLoading(true);
+    setLoading(true); 
     jsonp(myUrl.toString(), null, function (err, res) {
       let label = "";
       if (err) {
@@ -277,7 +331,6 @@ function ResourcePage(props) {
         value.data = data[0][key];
         visibleMap[key] = value;
       }
-      // console.log(stats);
       setVisibleMap(visibleMap);
       if (supported) {
         Axios.post("http://localhost:5000/getRowText", {
@@ -285,18 +338,15 @@ function ResourcePage(props) {
           info: infoMap,
           data: visibleMap,
           stats: stats,
+          resourceName: resourceName,
         })
           .then((result) => {
             let graphData = [];
             for (var key of Object.keys(data[0])) {
-              console.log(key + " -> " + data[0][key]);
               if (key.includes("_est") && !key.includes("total_est")) {
-                console.log("inside", key + " -> " + data[0][key]);
                 graphData.push({ key: key, ethnicity: data[0][key] });
               }
             }
-
-            console.log(graphData);
             setGraphState(graphData);
             setMessage(result.data);
           })
