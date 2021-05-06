@@ -39,12 +39,15 @@ function PackagePage() {
     },
     {
       field: "name",
-      headerName: "Name",
+      headerName: "Region",
+      // valueFormatter: (params) => {
+      //   return (params.value.split("(")[0]);
+      // },
       width: 500,
     },
     {
       field: "description",
-      headerName: "Description",
+      headerName: "Year info",
       width: 150,
     },
   ];
@@ -106,7 +109,7 @@ function PackagePage() {
         >
           Go back
         </Button>
-      <ResourcePage data={{NLGData: packageNLGData, resourceId: rowData.data.id, displayData:packageDisplayData }}></ResourcePage>
+      <ResourcePage data={{NLGData: packageNLGData, resourceName:rowData.data.name, yearFormat:rowData.data.description, resourceId: rowData.data.id, displayData:packageDisplayData }}></ResourcePage>
     </div>
   }
   return (

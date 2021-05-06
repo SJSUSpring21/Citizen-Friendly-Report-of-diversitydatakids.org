@@ -44,7 +44,7 @@ function ResourcePage(props) {
   //   "61430b80-e431-4db0-a7f1-490ec1c9a7d8"
   // );
 
-  const { resourceId, NLGData, displayData } = props.data;
+  const { resourceId,yearFormat, resourceName, NLGData, displayData } = props.data;
   const [warning, setWarning] = useState(false);
   const [chart, setChartType] = useState("bar");
   const [rowData, setRowData] = useState({});
@@ -60,9 +60,16 @@ function ResourcePage(props) {
   const [message, setMessage] = useState("");
   const [supported, setSupported] = useState(false);
   const [graphState, setGraphState] = useState([]);
+  const [stats, setStats] = useState({
+    min: -1,
+    max: -1,
+    avg: -1,
+  });
+  const [overview, setOverview] = useState("");
   let myUrl = "";
 
   useEffect(() => {
+    fetchStatistics();
     fetchCkanData();
   }, [props]);
   const createUrl = () => {
@@ -72,6 +79,33 @@ function ResourcePage(props) {
     myUrl.searchParams.append("limit", pageSize);
     myUrl.searchParams.append("resource_id", resourceId);
   };
+
+  const fetchStatistics = () => {
+    // let statUrl = "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT name, year, total_est from \""+resourceId+"\" where total_est = (SELECT aggregation(total_est) from \""+resourceId+"\")"
+    let url =
+      'https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT min(total_est),max(total_est),avg(total_est) from "' +
+      resourceId +
+      '" where total_est > 0';
+    jsonp(url, null, function (err, res) {
+      if (err) {
+        setWarning(true);
+      } else {
+        let data = res.result.records[0];
+        if (data && res.success) {
+          setStats({ min: data.min, max: data.max, avg: data.avg });
+          Axios.post("http://localhost:5000/getOverview", {
+            NLGData: NLGData,
+            stats: { min: data.min, max: data.max, avg: data.avg },
+            resourceName: resourceName,
+            yearFormat: yearFormat,
+          }).then((result) => {
+            setOverview(result.data);
+          });
+        }
+      }
+    });
+  };
+
   const fetchCkanData = () => {
     if (resourceId === "") {
       setWarning(true);
@@ -181,6 +215,7 @@ function ResourcePage(props) {
         value.data = data[0][key];
         visibleMap[key] = value;
       }
+      console.log(stats);
       setVisibleMap(visibleMap);
       if (supported) {
         Axios.post("http://localhost:5000/getRowText", {
@@ -269,104 +304,110 @@ function ResourcePage(props) {
           // limit={pageSize}
         />
       </div>
-      <div style={{display:"flex"}}>
+      <div style={{ display: "flex" }}>
         <div>
-        {message.length && (
-          <React.Fragment>
-            <div className={classes.root}>
-              {chart == "bar" && (
-                <ButtonGroup
-                  color="primary"
-                  aria-label="outlined primary button group"
-                >
-                  <Button
+          {message.length && (
+            <React.Fragment>
+              <div className={classes.root}>
+                {chart == "bar" && (
+                  <ButtonGroup
                     color="primary"
-                    variant="contained"
-                    onClick={() => {
-                      showBarChart();
-                    }}
+                    aria-label="outlined primary button group"
                   >
-                    Bar
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      showPieChart();
-                    }}
-                  >
-                    Pie
-                  </Button>
-                </ButtonGroup>
-              )}
-              {chart == "pie" && (
-                <ButtonGroup
-                  color="primary"
-                  aria-label="outlined primary button group"
-                >
-                  <Button
-                    onClick={() => {
-                      showBarChart();
-                    }}
-                  >
-                    Bar
-                  </Button>
-                  <Button
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => {
+                        showBarChart();
+                      }}
+                    >
+                      Bar
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        showPieChart();
+                      }}
+                    >
+                      Pie
+                    </Button>
+                  </ButtonGroup>
+                )}
+                {chart == "pie" && (
+                  <ButtonGroup
                     color="primary"
-                    variant="contained"
-                    onClick={() => {
-                      showPieChart();
-                    }}
+                    aria-label="outlined primary button group"
                   >
-                    Pie
-                  </Button>
-                </ButtonGroup>
-              )}
-            </div>
+                    <Button
+                      onClick={() => {
+                        showBarChart();
+                      }}
+                    >
+                      Bar
+                    </Button>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => {
+                        showPieChart();
+                      }}
+                    >
+                      Pie
+                    </Button>
+                  </ButtonGroup>
+                )}
+              </div>
 
-            <CssBaseline />
-            <Container maxWidth="sm" className={chart == "pie" ? "pie" : "bar"}>
-              {chart == "bar" && (
-                <BarChart
-                  width={500}
-                  height={300}
-                  data={graphState}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="key" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="ethnicity" fill="#8884d8" />
-                </BarChart>
-              )}
-              {chart == "pie" && (
-                <PieChart width={500} height={250}>
-                  <Pie
-                    isAnimationActive={false}
-                    dataKey="ethnicity"
-                    startAngle={180}
-                    endAngle={0}
+              <CssBaseline />
+              <Container
+                maxWidth="sm"
+                className={chart == "pie" ? "pie" : "bar"}
+              >
+                {chart == "bar" && (
+                  <BarChart
+                    width={500}
+                    height={300}
                     data={graphState}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    label
-                  />
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="key" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="ethnicity" fill="#8884d8" />
+                  </BarChart>
+                )}
+                {chart == "pie" && (
+                  <PieChart width={500} height={250}>
+                    <Pie
+                      isAnimationActive={false}
+                      dataKey="ethnicity"
+                      startAngle={180}
+                      endAngle={0}
+                      data={graphState}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      fill="#8884d8"
+                      label
+                    />
 
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              )}
-            </Container>
-          </React.Fragment>
-        )}
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                )}
+              </Container>
+            </React.Fragment>
+          )}
         </div>
-        <div>{message}</div>
+        <div>
+          <div>{overview}</div>
+          <div>{message}</div>
+        </div>
       </div>
     </div>
   );

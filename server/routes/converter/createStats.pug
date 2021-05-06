@@ -1,0 +1,24 @@
+include synonyms
+
+
+mixin percent 
+    if(NLG.Scale[0] === 'Percent')
+        |%
+
+mixin yearCount
+    | #{Number(yearFormat.split("-")[0]) > 1 ? "5 Years" : "1 Year"}
+
+p
+    if(stats.avg > 0)
+    | In the #{resourceName.split("(")[0]} as per the #[+records], in a period of #[+yearCount]
+    | #[+theAverage] no of 
+    | #{NLG.Title}
+    | is 
+    | #{Math.round(stats.avg)} #[+percent]
+    | and
+    | the #[+highest] value ever #[+recorded] was 
+    | #{Math.round(stats.max)}  #[+percent], 
+    | whereas the #[+lowest] value to ever #[+record] was 
+    | #{Math.round(stats.min)}  #[+percent]
+    
+    

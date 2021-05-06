@@ -1,7 +1,3 @@
-//- mixin listRaces  
-//-     | the available races are 
-//-     eachz test in Object.keys(map) with {separator:',', last_separator:'and', end:'.'}
-//-         | #{map[test].title.replace(" Alone","")}
 include synonyms
 
 mixin percent 
@@ -15,7 +11,12 @@ mixin intro
     else 
         | #[+singleYear]
     | #{info.year.data}
-    
+
+mixin numericValue 
+    if(info.total_est.data === null || info.total_est.data === undefined)
+        | not #[+recorded]
+    else 
+        | #{info.total_est.data} #[+percent]
 
 mixin header 
     | #{NLG.Title}
@@ -59,7 +60,7 @@ mixin rest
 
 mixin total
     | the total #{NLG.Scale[0]} of #[+header] 
-    | is #{info.total_est.data} #[+percent]
+    | is #[+numericValue]
 
 mixin zero 
     | For the 
@@ -79,7 +80,8 @@ mixin unknown
         | community
 
 mixin avg 
-    | with #[+anAverage] value of #{avg}
+    if(avg)
+        | with #[+anAverage] value of #{avg}
 //- ----------------------------------
 
 p
@@ -93,7 +95,7 @@ p
         if(minArray && minArray.length > 0)
             | Whereas
             | #[+min]
-    if(minArray && maxArray && min === max)
+    if(minArray && minArray.length > 0 && min === max)
         | #[+minMax]
     
     //- if(zeroArray && zeroArray.length>0)
