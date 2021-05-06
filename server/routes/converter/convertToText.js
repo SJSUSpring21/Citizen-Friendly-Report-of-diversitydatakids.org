@@ -5,7 +5,7 @@ const rosaenlgPug = require("rosaenlg");
 module.exports = router;
 
 router.post("/getRowText", (req, res) => {
-  const { NLGData, info, data } = req.body;
+  const { NLGData, info, data, stats } = req.body;
   let text = "";
   let min, max, avg;
   let minArray = [],maxArray=[], unknownArray = [], zeroArray = [], other = {};
@@ -46,6 +46,7 @@ router.post("/getRowText", (req, res) => {
       unknownArray: unknownArray,
       zeroArray: zeroArray,
       other: other,
+      stats: stats,
       cache: true
     });
   } else {
@@ -56,7 +57,6 @@ router.post("/getRowText", (req, res) => {
       data: data,
       cache: true
     });
-    console.log(text);
   }
 
   res.status(200).send(text);

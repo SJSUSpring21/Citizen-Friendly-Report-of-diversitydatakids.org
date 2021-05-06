@@ -1,5 +1,26 @@
 include synonyms
 
+
+mixin rest
+    | Of the remaining races #race# has #count# 
+
+mixin zero 
+    | For the 
+    eachz el in zeroArray with {separator:',', last_separator:'and'}
+         | #{el}
+    | entries in the dataset are #[+recorded] as 0. 
+
+mixin unknown 
+    | Entries in the dataset are #[+recorded] as null   
+    | for the [
+    eachz el in unknownArray with {separator:',', last_separator:'and'}
+         | #{el}
+    | ] 
+    if(unknownArray.length > 1)
+        | communities 
+    else 
+        | community
+
 mixin percent 
     if(NLG.Scale[0] === 'Percent')
         |%
@@ -55,39 +76,32 @@ mixin minMax
     | #[+percent]
     | .
 
-mixin rest
-    | Of the remaining races #race# has #count# 
-
 mixin total
     | the total #{NLG.Scale[0]} of #[+header] 
     | is #[+numericValue]
 
-mixin zero 
-    | For the 
-    eachz el in zeroArray with {separator:',', last_separator:'and'}
-         | #{el}
-    | entries in the dataset are #[+recorded] as 0. 
-
-mixin unknown 
-    | Entries in the dataset are #[+recorded] as null   
-    | for the [
-    eachz el in unknownArray with {separator:',', last_separator:'and'}
-         | #{el}
-    | ] 
-    if(unknownArray.length > 1)
-        | communities 
-    else 
-        | community
-
 mixin avg 
     if(avg)
-        | with #[+anAverage] value of #{avg}
+        | with #[+anAverage] value of #{avg} for #[+different] #[+races]
+
+mixin compare 
+    if(stats && stats.avg !== -1)
+        if(info.total_est.data > stats.avg)
+            | this #{NLG.Scale[0]} is #[+greater] than the #[+records] #[+Average]
+            | by a value of #{info.total_est.data - Math.round(stats.avg)}.
+        if(info.total_est.data < stats.avg)
+            | this #{NLG.Scale[0]} is #[+lower] than the #[+records] #[+Average]
+            | by a value of #{Math.round(stats.avg) - info.total_est.data}.
+        else 
+            | this #{NLG.Scale[0]} is same as the #[+records] #[+Average].
+
 //- ----------------------------------
 
 p
     | #[+intro]
     | #[+total]
     | #[+avg].
+    | #[+compare]
     if((minArray && minArray.length > 0) || (maxArray && maxArray.length > 0) && min !== max )
         if(maxArray && maxArray.length > 0)
             | #[+AmongThem]

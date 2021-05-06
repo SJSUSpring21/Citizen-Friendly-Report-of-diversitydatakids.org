@@ -3,7 +3,6 @@ import { useCallback } from "react";
 import React, { useEffect, useState } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import jsonp from "jsonp";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
 import Container from "@material-ui/core/Container";
 import { Button, Snackbar, Typography } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
@@ -38,19 +37,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ResourcePage(props) {
-  const [genText, setGenText] = useState([]);
   const classes = useStyles();
-  // const [resourceID, setResourceId] = useState(
-  //   "61430b80-e431-4db0-a7f1-490ec1c9a7d8"
-  // );
-
   const { resourceId,yearFormat, resourceName, NLGData, displayData } = props.data;
   const [warning, setWarning] = useState(false);
   const [chart, setChartType] = useState("bar");
   const [rowData, setRowData] = useState({});
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const [loading, setLoading] = useState(true);
   const [columnMap, setColumnMap] = useState({});
   const [visibleMap, setVisibleMap] = useState({});
@@ -151,7 +145,7 @@ function ResourcePage(props) {
                 };
               } else {
                 columnMap[field.id] = { title: "id", visible: true };
-                return { name: field.id, header: "id", hide: true };
+                return { name: field.id, header: "id", visible: false };
               }
             })
         );
@@ -204,7 +198,6 @@ function ResourcePage(props) {
 
   const onSelectionChange = useCallback(
     ({ selected: selectedMap, data }) => {
-      console.log("test");
       setRowData(data[0]);
       for (const [key, value] of Object.entries(infoMap)) {
         value.data = data[0][key];
@@ -215,13 +208,14 @@ function ResourcePage(props) {
         value.data = data[0][key];
         visibleMap[key] = value;
       }
-      console.log(stats);
+      // console.log(stats);
       setVisibleMap(visibleMap);
       if (supported) {
         Axios.post("http://localhost:5000/getRowText", {
           NLGData: NLGData,
           info: infoMap,
           data: visibleMap,
+          stats: stats,
         })
           .then((result) => {
             let graphData = [];
@@ -242,7 +236,7 @@ function ResourcePage(props) {
         setMessage("NLG is not supported for this kind of dataset");
       }
     },
-    [supported, NLGData, infoMap, visibleMap]
+    [supported, NLGData, infoMap, visibleMap,stats]
   );
 
   let CustomTooltip = ({ active, payload, label }) => {
