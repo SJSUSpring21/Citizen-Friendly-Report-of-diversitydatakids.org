@@ -2,3 +2,15 @@
   width: 39vw !important;
   padding-top: 10vh !important;
 }
+
+.pie-text {
+  margin-top: -70px;
+}
+
+.name-filter-div {
+  margin-left: 10px;
+}
+
+.filter {
+  width: 10vw !important;
+}

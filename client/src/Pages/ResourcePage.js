@@ -3,12 +3,21 @@ import { useCallback } from "react";
 import React, { useEffect, useState } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import jsonp from "jsonp";
+import {
+  DataGrid,
+  GridToolbar,
+  setGridPageActionCreator,
+} from "@material-ui/data-grid";
 import Container from "@material-ui/core/Container";
 import { Button, Snackbar, Typography } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 import "./ResourcePage.css";
 import {
   BarChart,
@@ -37,14 +46,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ResourcePage(props) {
+  const [genText, setGenText] = useState([]);
+  const [name, setName] = useState("");
   const classes = useStyles();
-  const { resourceId,yearFormat, resourceName, NLGData, displayData } = props.data;
+  // const [resourceID, setResourceId] = useState(
+  //   "61430b80-e431-4db0-a7f1-490ec1c9a7d8"
+  // );
+
+  const { resourceId, NLGData, displayData } = props.data;
   const [warning, setWarning] = useState(false);
   const [chart, setChartType] = useState("bar");
   const [rowData, setRowData] = useState({});
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [columnMap, setColumnMap] = useState({});
   const [visibleMap, setVisibleMap] = useState({});
@@ -54,18 +69,63 @@ function ResourcePage(props) {
   const [message, setMessage] = useState("");
   const [supported, setSupported] = useState(false);
   const [graphState, setGraphState] = useState([]);
-  const [stats, setStats] = useState({
-    min: -1,
-    max: -1,
-    avg: -1,
-  });
-  const [overview, setOverview] = useState("");
+  const [name_filter, setNameFilter] = useState([]);
   let myUrl = "";
 
   useEffect(() => {
-    fetchStatistics();
-    fetchCkanData();
+    console.log("helllllo");
+    fetchFilterData();
   }, [props]);
+
+  const createUrlFilters = () => {
+    const base =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search";
+    myUrl = new URL(base);
+    myUrl.searchParams.append("offset", 0);
+    myUrl.searchParams.append("fields", "name");
+    myUrl.searchParams.append("distinct", "true");
+    myUrl.searchParams.append("include_total", "false");
+    myUrl.searchParams.append("resource_id", resourceId);
+  };
+
+  const fetchFilterData = () => {
+    if (resourceId === "") {
+      setWarning(true);
+      return;
+    }
+    createUrlFilters();
+    setLoading(true);
+    jsonp(myUrl.toString(), null, function (err, res) {
+      let label = "";
+      if (err) {
+        setWarning(true);
+        setLoading(false);
+        return;
+      } else {
+        console.log(res.result.records);
+        let name_filter = res.result.records.map((record) => {
+          return record.name;
+        });
+
+        setName(name_filter[0]);
+        fetchCkanData(name_filter[0]);
+
+        console.log(name_filter);
+        setNameFilter(name_filter);
+      }
+    });
+  };
+
+  const createUrl_sql = (filter) => {
+    const base =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search_sql";
+    myUrl = new URL(base);
+    myUrl.searchParams.append(
+      "sql",
+      'SELECT * from "' + resourceId + "\" WHERE name LIKE '" + filter + "'"
+    );
+  };
+
   const createUrl = () => {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
@@ -73,39 +133,12 @@ function ResourcePage(props) {
     myUrl.searchParams.append("limit", pageSize);
     myUrl.searchParams.append("resource_id", resourceId);
   };
-
-  const fetchStatistics = () => {
-    // let statUrl = "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT name, year, total_est from \""+resourceId+"\" where total_est = (SELECT aggregation(total_est) from \""+resourceId+"\")"
-    let url =
-      'https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT min(total_est),max(total_est),avg(total_est) from "' +
-      resourceId +
-      '" where total_est > 0';
-    jsonp(url, null, function (err, res) {
-      if (err) {
-        setWarning(true);
-      } else {
-        let data = res.result.records[0];
-        if (data && res.success) {
-          setStats({ min: data.min, max: data.max, avg: data.avg });
-          Axios.post("http://localhost:5000/getOverview", {
-            NLGData: NLGData,
-            stats: { min: data.min, max: data.max, avg: data.avg },
-            resourceName: resourceName,
-            yearFormat: yearFormat,
-          }).then((result) => {
-            setOverview(result.data);
-          });
-        }
-      }
-    });
-  };
-
-  const fetchCkanData = () => {
+  const fetchCkanData = (filter) => {
     if (resourceId === "") {
       setWarning(true);
       return;
     }
-    createUrl();
+    createUrl_sql(filter);
     setLoading(true);
     jsonp(myUrl.toString(), null, function (err, res) {
       let label = "";
@@ -145,7 +178,7 @@ function ResourcePage(props) {
                 };
               } else {
                 columnMap[field.id] = { title: "id", visible: true };
-                return { name: field.id, header: "id", visible: false };
+                return { name: field.id, header: "id", hide: true };
               }
             })
         );
@@ -198,6 +231,7 @@ function ResourcePage(props) {
 
   const onSelectionChange = useCallback(
     ({ selected: selectedMap, data }) => {
+      console.log("test");
       setRowData(data[0]);
       for (const [key, value] of Object.entries(infoMap)) {
         value.data = data[0][key];
@@ -208,14 +242,12 @@ function ResourcePage(props) {
         value.data = data[0][key];
         visibleMap[key] = value;
       }
-      // console.log(stats);
       setVisibleMap(visibleMap);
       if (supported) {
         Axios.post("http://localhost:5000/getRowText", {
           NLGData: NLGData,
           info: infoMap,
           data: visibleMap,
-          stats: stats,
         })
           .then((result) => {
             let graphData = [];
@@ -223,6 +255,7 @@ function ResourcePage(props) {
               console.log(key + " -> " + data[0][key]);
               if (key.includes("_est") && !key.includes("total_est")) {
                 console.log("inside", key + " -> " + data[0][key]);
+
                 graphData.push({ key: key, ethnicity: data[0][key] });
               }
             }
@@ -236,7 +269,7 @@ function ResourcePage(props) {
         setMessage("NLG is not supported for this kind of dataset");
       }
     },
-    [supported, NLGData, infoMap, visibleMap,stats]
+    [supported, NLGData, infoMap, visibleMap]
   );
 
   let CustomTooltip = ({ active, payload, label }) => {
@@ -250,12 +283,20 @@ function ResourcePage(props) {
             border: "1px solid #cccc",
           }}
         >
-          <label>{payload[0].payload.payload.key}</label>
+          <label>
+            {console.log()}
+            {payload[0].payload.payload.key}:{" "}
+            {payload[0].payload.payload.ethnicity}
+          </label>
         </div>
       );
     }
 
     return null;
+  };
+
+  const handleChangeNameFilter = (e) => {
+    setName(e.target.value);
   };
 
   const onColumnVisibleChange = (data) => {
@@ -275,6 +316,22 @@ function ResourcePage(props) {
   };
   return (
     <div className="App">
+      <div className="name-filter-div">
+        <FormControl>
+          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <Select
+            className="filter"
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={name}
+            onChange={handleChangeNameFilter}
+          >
+            {name_filter.map((value) => (
+              <MenuItem value={value}>{value}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
       <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
         <Alert onClose={closeWarning} severity="error">
           Please enter correct resource id
@@ -298,109 +355,121 @@ function ResourcePage(props) {
           // limit={pageSize}
         />
       </div>
-      <div style={{ display: "flex" }}>
-        <div>
-          {message.length && (
-            <React.Fragment>
-              <div className={classes.root}>
-                {chart == "bar" && (
-                  <ButtonGroup
-                    color="primary"
-                    aria-label="outlined primary button group"
-                  >
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => {
-                        showBarChart();
-                      }}
-                    >
-                      Bar
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        showPieChart();
-                      }}
-                    >
-                      Pie
-                    </Button>
-                  </ButtonGroup>
-                )}
-                {chart == "pie" && (
-                  <ButtonGroup
-                    color="primary"
-                    aria-label="outlined primary button group"
-                  >
-                    <Button
-                      onClick={() => {
-                        showBarChart();
-                      }}
-                    >
-                      Bar
-                    </Button>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => {
-                        showPieChart();
-                      }}
-                    >
-                      Pie
-                    </Button>
-                  </ButtonGroup>
-                )}
-              </div>
+      <div>
+        {/* <Button
+          style={{ margin: "8px", display: "block", marginLeft: "auto" }}
+          variant="contained"
+          color="primary"
+          disabled={Object.keys(rowData).length === 0}
+          onClick={() => {
+            console.log({
+              NLGData: NLGData,
+              columnMap: columnMap,
+              rowData: rowData,
+              columns: columns,
+            });
+          }}
+        >
+          Get Insights
+        </Button> */}
 
-              <CssBaseline />
-              <Container
-                maxWidth="sm"
-                className={chart == "pie" ? "pie" : "bar"}
-              >
-                {chart == "bar" && (
-                  <BarChart
-                    width={500}
-                    height={300}
-                    data={graphState}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
+        {message.length && (
+          <React.Fragment>
+            <div className={classes.root}>
+              {chart == "bar" && (
+                <ButtonGroup
+                  color="primary"
+                  aria-label="outlined primary button group"
+                >
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    onClick={() => {
+                      showBarChart();
                     }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="key" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="ethnicity" fill="#8884d8" />
-                  </BarChart>
-                )}
-                {chart == "pie" && (
-                  <PieChart width={500} height={250}>
-                    <Pie
-                      isAnimationActive={false}
-                      dataKey="ethnicity"
-                      startAngle={180}
-                      endAngle={0}
-                      data={graphState}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    />
+                    Bar
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      showPieChart();
+                    }}
+                  >
+                    Pie
+                  </Button>
+                </ButtonGroup>
+              )}
+              {chart == "pie" && (
+                <ButtonGroup
+                  color="primary"
+                  aria-label="outlined primary button group"
+                >
+                  <Button
+                    onClick={() => {
+                      showBarChart();
+                    }}
+                  >
+                    Bar
+                  </Button>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    onClick={() => {
+                      showPieChart();
+                    }}
+                  >
+                    Pie
+                  </Button>
+                </ButtonGroup>
+              )}
+            </div>
 
-                    <Tooltip content={<CustomTooltip />} />
-                  </PieChart>
-                )}
-              </Container>
-            </React.Fragment>
-          )}
-        </div>
-        <div>
-          <div>{overview}</div>
-          <div>{message}</div>
+            <CssBaseline />
+            <Container maxWidth="sm" className={chart == "pie" ? "pie" : "bar"}>
+              {chart == "bar" && (
+                <BarChart
+                  width={500}
+                  height={300}
+                  data={graphState}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="key" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="ethnicity" fill="#8884d8" />
+                </BarChart>
+              )}
+              {chart == "pie" && (
+                <PieChart width={500} height={250}>
+                  <Pie
+                    isAnimationActive={false}
+                    dataKey="ethnicity"
+                    startAngle={180}
+                    endAngle={0}
+                    data={graphState}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    fill="#8884d8"
+                    label
+                  />
+
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              )}
+            </Container>
+          </React.Fragment>
+        )}
+
+        <div className={chart == "pie" ? "pie-text" : "bar-text"}>
+          {message}
         </div>
       </div>
     </div>

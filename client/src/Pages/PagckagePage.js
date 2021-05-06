@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import jsonp from "jsonp";
-import { DataGrid,} from "@material-ui/data-grid";
+import { DataGrid } from "@material-ui/data-grid";
 import {
   Button,
   FormControl,
@@ -35,19 +34,16 @@ function PackagePage() {
     {
       field: "id",
       headerName: "id",
-      hide: true
+      hide: true,
     },
     {
       field: "name",
-      headerName: "Region",
-      // valueFormatter: (params) => {
-      //   return (params.value.split("(")[0]);
-      // },
+      headerName: "Name",
       width: 500,
     },
     {
       field: "description",
-      headerName: "Year info",
+      headerName: "Description",
       width: 150,
     },
   ];
@@ -92,14 +88,15 @@ function PackagePage() {
           name: res.result.name,
           notes: res.result.notes,
         });
-        setRows(res.result.resources)
+        setRows(res.result.resources);
         setLoading(false);
       }
     });
   };
-  if(resourceMode){
-    return <div>
-      <Button
+  if (resourceMode) {
+    return (
+      <div>
+        <Button
           style={{ margin: "8px", display: "block", marginRight: "auto" }}
           variant="contained"
           color="primary"
@@ -109,8 +106,15 @@ function PackagePage() {
         >
           Go back
         </Button>
-      <ResourcePage data={{NLGData: packageNLGData, resourceName:rowData.data.name, yearFormat:rowData.data.description, resourceId: rowData.data.id, displayData:packageDisplayData }}></ResourcePage>
-    </div>
+        <ResourcePage
+          data={{
+            NLGData: packageNLGData,
+            resourceId: rowData.data.id,
+            displayData: packageDisplayData,
+          }}
+        ></ResourcePage>
+      </div>
+    );
   }
   return (
     <div className="App">
@@ -151,20 +155,23 @@ function PackagePage() {
           getRowId={(row) => row.id}
           pageSize={20}
           onRowSelected={(rowData) => {
+            console.log(rowData);
+            setResourceMode(true);
             setRowData(rowData);
           }}
         />
-        <Button
+        {/* <Button
           style={{ margin: "8px", display: "block", marginLeft: "auto" }}
           variant="contained"
           color="primary"
           disabled={!(rowData && rowData.isSelected)}
           onClick={() => {
+            console.log("hello");
             setResourceMode(true);
           }}
         >
           Show Tabular content
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
