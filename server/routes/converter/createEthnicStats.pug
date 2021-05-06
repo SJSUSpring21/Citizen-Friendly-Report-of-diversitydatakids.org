@@ -1,0 +1,20 @@
+include synonyms
+
+mixin percent 
+    if(NLG.Scale[0] === 'Percent')
+        |%
+
+p
+    | the overall #[+Average] #{NLG.Scale[0]} for #[+each] #[+race] is #[+around] #{parseFloat(avg).toFixed(2)}, 
+    | Of all the #[+races],
+    eachz el in maxArray with {separator:',', last_separator:'and'}
+        | #{el}
+    | 
+    | has the #[+highest] share with #[+anAverage] value of #{parseFloat(max).toFixed(2)} #[+percent], and 
+    | the 
+    eachz el in minArray with {separator:',', last_separator:'and'}
+        | #{el}
+    | has the #[+lowest] #[+Average] of #{parseFloat(min).toFixed(2)} #[+percent].
+
+    
+    
