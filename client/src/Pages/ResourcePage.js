@@ -9,6 +9,10 @@ import Alert from "@material-ui/lab/Alert";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 import "./ResourcePage.css";
 import {
   BarChart,
@@ -38,7 +42,13 @@ const useStyles = makeStyles((theme) => ({
 
 function ResourcePage(props) {
   const classes = useStyles();
-  const { resourceId,yearFormat, resourceName, NLGData, displayData } = props.data;
+  const {
+    resourceId,
+    yearFormat,
+    resourceName,
+    NLGData,
+    displayData,
+  } = props.data;
   const [warning, setWarning] = useState(false);
   const [chart, setChartType] = useState("bar");
   const [rowData, setRowData] = useState({});
@@ -54,6 +64,8 @@ function ResourcePage(props) {
   const [message, setMessage] = useState("");
   const [supported, setSupported] = useState(false);
   const [graphState, setGraphState] = useState([]);
+  const [name_filter, setNameFilter] = useState([]);
+  const [name, setName] = useState("");
   const [stats, setStats] = useState({
     min: -1,
     max: -1,
@@ -63,15 +75,62 @@ function ResourcePage(props) {
   let myUrl = "";
 
   useEffect(() => {
+    fetchFilterData();
     fetchStatistics();
-    fetchCkanData();
+    // fetchCkanData();
   }, [props]);
-  const createUrl = () => {
+
+  const createUrlFilters = () => {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     myUrl = new URL(base);
-    myUrl.searchParams.append("limit", pageSize);
+    myUrl.searchParams.append("offset", 0);
+    myUrl.searchParams.append("fields", "name");
+    myUrl.searchParams.append("distinct", "true");
+    myUrl.searchParams.append("include_total", "false");
     myUrl.searchParams.append("resource_id", resourceId);
+  };
+
+  const handleChangeNameFilter = (e) => {
+    fetchCkanData(e.target.value);
+    setName(e.target.value);
+  };
+
+  const createUrl = (filter) => {
+    const base =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search";
+    myUrl = new URL(base);
+    myUrl.searchParams.append("resource_id", resourceId);
+    myUrl.searchParams.append("plain", "false");
+    myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
+  };
+
+  const fetchFilterData = () => {
+    if (resourceId === "") {
+      setWarning(true);
+      return;
+    }
+    createUrlFilters();
+    setLoading(true);
+    jsonp(myUrl.toString(), null, function (err, res) {
+      let label = "";
+      if (err) {
+        setWarning(true);
+        setLoading(false);
+        return;
+      } else {
+        console.log(res.result.records);
+        let name_filter = res.result.records.map((record) => {
+          return record.name;
+        });
+
+        setName(name_filter[0]);
+        fetchCkanData(name_filter[0]);
+
+        console.log(name_filter);
+        setNameFilter(name_filter);
+      }
+    });
   };
 
   const fetchStatistics = () => {
@@ -100,12 +159,22 @@ function ResourcePage(props) {
     });
   };
 
-  const fetchCkanData = () => {
+  const createUrl_sql = (filter) => {
+    const base =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search_sql";
+    myUrl = new URL(base);
+    myUrl.searchParams.append(
+      "sql",
+      'SELECT * from "' + resourceId + "\" WHERE name LIKE '" + filter + "'"
+    );
+  };
+
+  const fetchCkanData = (filter) => {
     if (resourceId === "") {
       setWarning(true);
       return;
     }
-    createUrl();
+    createUrl(filter);
     setLoading(true);
     jsonp(myUrl.toString(), null, function (err, res) {
       let label = "";
@@ -236,7 +305,7 @@ function ResourcePage(props) {
         setMessage("NLG is not supported for this kind of dataset");
       }
     },
-    [supported, NLGData, infoMap, visibleMap,stats]
+    [supported, NLGData, infoMap, visibleMap, stats]
   );
 
   let CustomTooltip = ({ active, payload, label }) => {
@@ -275,6 +344,22 @@ function ResourcePage(props) {
   };
   return (
     <div className="App">
+      <div className="name-filter-div">
+        <FormControl>
+          <InputLabel id="demo-simple-select-label">Name</InputLabel>
+          <Select
+            className="filter"
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={name}
+            onChange={handleChangeNameFilter}
+          >
+            {name_filter.map((value) => (
+              <MenuItem value={value}>{value}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
       <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
         <Alert onClose={closeWarning} severity="error">
           Please enter correct resource id
