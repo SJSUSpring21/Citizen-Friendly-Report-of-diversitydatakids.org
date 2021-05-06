@@ -96,12 +96,13 @@ function ResourcePage(props) {
     setName(e.target.value);
   };
 
-  const createUrl = () => {
+  const createUrl = (filter) => {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     myUrl = new URL(base);
-    myUrl.searchParams.append("limit", pageSize);
     myUrl.searchParams.append("resource_id", resourceId);
+    myUrl.searchParams.append("plain", "false");
+    myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
   };
 
   const fetchFilterData = () => {
@@ -173,7 +174,7 @@ function ResourcePage(props) {
       setWarning(true);
       return;
     }
-    createUrl_sql(filter);
+    createUrl(filter);
     setLoading(true);
     jsonp(myUrl.toString(), null, function (err, res) {
       let label = "";
@@ -345,7 +346,7 @@ function ResourcePage(props) {
     <div className="App">
       <div className="name-filter-div">
         <FormControl>
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <InputLabel id="demo-simple-select-label">Name</InputLabel>
           <Select
             className="filter"
             labelId="demo-simple-select-label"
