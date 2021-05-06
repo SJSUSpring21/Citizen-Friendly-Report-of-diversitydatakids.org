@@ -101,8 +101,8 @@ function ResourcePage(props) {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     myUrl = new URL(base);
+    myUrl.searchParams.append("limit",pageSize);
     myUrl.searchParams.append("resource_id", resourceId);
-    myUrl.searchParams.append("plain", "false");
     myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
   };
 
@@ -154,15 +154,6 @@ function ResourcePage(props) {
         }
       }
     });
-  };
-  const createUrl_sql = (filter) => {
-    const base =
-      "https://data.diversitydatakids.org/api/3/action/datastore_search_sql";
-    myUrl = new URL(base);
-    myUrl.searchParams.append(
-      "sql",
-      'SELECT * from "' + resourceId + "\" WHERE name LIKE '" + filter + "'"
-    );
   };
 
   const fetchEthnicStats = () => {
@@ -535,6 +526,7 @@ function ResourcePage(props) {
         </div>
         <div>
           <div>{overview}</div>
+          <div>{ethnicStats}</div>
           <div>{message}</div>
         </div>
       </div>

@@ -5,7 +5,7 @@ mixin percent
         |%
 
 p
-    | the overall #[+Average] #{NLG.Scale[0]} for #[+each] #[+race] is #[+around] #{parseFloat(avg).toFixed(2)}, 
+    //- | the overall #[+Average] for #[+each] #[+race] is #[+around] #{parseFloat(avg).toFixed(2)}. 
     | Of all the #[+races],
     eachz el in maxArray with {separator:',', last_separator:'and'}
         | #{el}
