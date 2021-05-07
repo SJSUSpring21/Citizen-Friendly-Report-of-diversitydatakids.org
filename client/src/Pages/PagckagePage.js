@@ -6,6 +6,7 @@ import {
   FormControl,
   FormGroup,
   IconButton,
+  makeStyles,
   Snackbar,
   TextField,
   Typography,
@@ -19,7 +20,16 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
+
 function PackagePage(params) {
+  const classes = useStyles();
   const urlQuery = useQuery();
   console.log(urlQuery);
   let id = urlQuery.get("id");
@@ -52,6 +62,14 @@ function PackagePage(params) {
       //   return (params.value.split("(")[0]);
       // },
       width: 500,
+      renderCell: (params) => {
+        return <div className={classes.root}>
+        <Button color="primary" onClick={()=>{
+          setRowData(params.row)
+          setResourceMode(true);
+        }}>{params.value}</Button>
+      </div>
+      }
     },
     {
       field: "description",
@@ -74,6 +92,7 @@ function PackagePage(params) {
     myUrl = new URL(base);
     myUrl.searchParams.append("id", id);
   };
+
 
   useEffect(() => {
     fetchCkanData();
@@ -157,19 +176,19 @@ function PackagePage(params) {
           {title}
         </Typography>
       </div>
-      <div style={{ height: 400, width: "100%" }}>
+      <div style={{ height:"500px",  width: "100%" }}>
         <DataGrid
           rows={rows}
           columns={columns}
           loading={loading}
           getRowId={(row) => row.id}
-          pageSize={20}
+          pageSize={10}
           onRowSelected={(rowData) => {
             setRowData(rowData);
           }}
         />
       </div>
-      <Button
+      {/* <Button
         style={{ margin: "8px", display: "block", marginLeft: "auto" }}
         variant="contained"
         color="primary"
@@ -179,7 +198,7 @@ function PackagePage(params) {
         }}
       >
         Get Dataset
-      </Button>
+      </Button> */}
     </div>
   );
 }
