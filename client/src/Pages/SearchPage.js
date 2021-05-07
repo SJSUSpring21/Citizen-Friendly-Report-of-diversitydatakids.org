@@ -1,29 +1,88 @@
 import { useEffect, useState } from "react";
-import jsonp from "jsonp";
 import { DataGrid } from "@material-ui/data-grid";
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 
 import SearchIcon from "@material-ui/icons/Search";
-import { Button, IconButton, Snackbar, TextField } from "@material-ui/core";
+import {
+  Button,
+  IconButton,
+  InputBase,
+  Paper,
+  Snackbar,
+  Tooltip,
+} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import Axios from "axios";
+import { Link } from "react-router-dom";
 
+const useStylesBootstrap = makeStyles((theme) => ({
+  arrow: {
+    color: theme.palette.common.black,
+  },
+  tooltip: {
+    backgroundColor: theme.palette.common.black,
+  },
+}));
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    padding: "2px 4px",
+    display: "flex",
+    alignItems: "center",
+    width: "auto",
+    margin: "8px 240px",
+  },
+  input: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
+  },
+}));
+
+const LightTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.common.white,
+    color: "rgba(0, 0, 0, 0.87)",
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}))(Tooltip);
+
+function BootstrapTooltip(props) {
+  const classes = useStylesBootstrap();
+
+  return <Tooltip arrow classes={classes} {...props} />;
+}
 function SearchPage() {
-  const [packageId, setPackageId] = useState(
-    "17010_1_c-single-parent-families-with-children-aged-0-17-years--count--by-race-ethnicity"
-  );
-
+  const classes = useStyles();
   const [rowData, setRowData] = useState({});
   const [rows, setRows] = useState([]);
   const [input, setInput] = useState("");
+  const [isSelected, setIsSelected] = useState(false);
   const columns = [
     {
       field: "title",
-      headerName: "Title",
+      headerName: "Dataset Name",
+      headerClassName: "grid-header",
+      flex: 400,
     },
     {
       field: "notes",
-      headerName: "Description",
-      flex:500
+      headerName: "Dataset Description",
+      headerClassName: "grid-header",
+      flex: 400,
+      renderCell: (params) => {
+        return (
+          <BootstrapTooltip
+            title={params.value}
+            style={{ overflow: "hidden", minWidth: "100%" }}
+          >
+            <span className="table-cell-trucate">{params.value}</span>
+          </BootstrapTooltip>
+        );
+      },
     },
     {
       field: "id",
@@ -34,26 +93,17 @@ function SearchPage() {
   ];
   const [warning, setWarning] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resourceMode, setResourceMode] = useState(false);
-  let myUrl = "";
   const closeWarning = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
     setWarning(false);
   };
-  const createUrl = () => {
-    const base = "https://data.diversitydatakids.org/api/search/dataset";
-    myUrl = new URL(base);
-    myUrl.searchParams.append("fq", "");
-    myUrl.searchParams.append("q", input);
-    myUrl.searchParams.append("fl", "title,notes");
-    myUrl.searchParams.append("rows", "1000");
-  };
 
   useEffect(() => {
     fetchCkanData();
   }, []);
+
   const fetchCkanData = () => {
     setLoading(true);
     Axios.post("http://localhost:5000/search", {
@@ -62,24 +112,42 @@ function SearchPage() {
       .then((result) => {
         setRows(result.data.results);
         setLoading(false);
-        console.log(result);
       })
       .catch((err) => {
         setLoading(false);
-        console.log(err);
       });
   };
+  const preventDefault = (event) => event.preventDefault();
   return (
     <div className="App">
-      <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
-        <Alert onClose={closeWarning} severity="error">
-          Please enter correct package id
-        </Alert>
-      </Snackbar>
-      <TextField id="standard-search" label="Search field" type="search" />
-      <IconButton aria-label="delete">
-        <SearchIcon />
-      </IconButton>
+      <Paper component="form" className={classes.root}>
+        <InputBase
+          type="input"
+          className={classes.input}
+          placeholder="Search Datasets"
+          inputProps={{ "aria-label": "search datasets" }}
+          onChange={(e) => {
+            setInput(e.target.value);
+          }}
+        />
+        <IconButton
+          className={classes.iconButton}
+          aria-label="search"
+          onClick={(e) => {
+            console.log(e);
+            fetchCkanData();
+          }}
+        >
+          <SearchIcon />
+        </IconButton>
+      </Paper>
+      <div style={{ margin: "8px" }}>
+        <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
+          <Alert onClose={closeWarning} severity="error">
+            Unable to fetch data
+          </Alert>
+        </Snackbar>
+      </div>
       <div style={{ height: 400, width: "100%" }}>
         <DataGrid
           rows={rows}
@@ -87,22 +155,18 @@ function SearchPage() {
           loading={loading}
           getRowId={(row) => row.id}
           pageSize={20}
-          onRowSelected={(rowData) => {
-            setRowData(rowData);
+          onRowSelected={(e) => {
+            setRowData(e.data);
+            setIsSelected(e.isSelected)
           }}
         />
-        <Button
-          style={{ margin: "8px", display: "block", marginLeft: "auto" }}
-          variant="contained"
-          color="primary"
-          disabled={!(rowData && rowData.isSelected)}
-          onClick={() => {
-            setResourceMode(true);
-          }}
-        >
-          Show Tabular content
-        </Button>
       </div>
+      <div style={{margin:"16px",display:"flex"}} >
+      {isSelected && <Link style={{marginLeft:"auto"}} to={"/packages?id=" + rowData.id } >
+          Show Geographic datasets
+        </Link>}
+      </div>
+      
     </div>
   );
 }

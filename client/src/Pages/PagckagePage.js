@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import jsonp from "jsonp";
-import { DataGrid,} from "@material-ui/data-grid";
+import { DataGrid } from "@material-ui/data-grid";
 import {
   Button,
   FormControl,
   FormGroup,
   Snackbar,
   TextField,
+  Typography,
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import ResourcePage from "./ResourcePage";
+import { useLocation } from "react-router";
 
-function PackagePage() {
-  const [packageId, setPackageId] = useState(
-    "17010_1_c-single-parent-families-with-children-aged-0-17-years--count--by-race-ethnicity"
-  );
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
+function PackagePage(params) {
+  const urlQuery = useQuery();
+  console.log(urlQuery);
+  let id = urlQuery.get("id");
+  const [title, setTitle] = useState("");
   const [packageNLGData, setPackageNLGData] = useState({
     Scale: "",
     Nativity: "",
@@ -34,7 +41,7 @@ function PackagePage() {
     {
       field: "id",
       headerName: "id",
-      hide: true
+      hide: true,
     },
     {
       field: "name",
@@ -63,10 +70,15 @@ function PackagePage() {
   const createUrl = () => {
     const base = "https://data.diversitydatakids.org/api/3/action/package_show";
     myUrl = new URL(base);
-    myUrl.searchParams.append("id", packageId);
+    myUrl.searchParams.append("id", id);
   };
+
+  useEffect(() => {
+    fetchCkanData();
+  }, []);
+
   const fetchCkanData = () => {
-    if (packageId === "") {
+    if (id === "") {
       setWarning(true);
       return;
     }
@@ -91,14 +103,16 @@ function PackagePage() {
           name: res.result.name,
           notes: res.result.notes,
         });
-        setRows(res.result.resources)
+        setTitle(res.result.title);
+        setRows(res.result.resources);
         setLoading(false);
       }
     });
   };
-  if(resourceMode){
-    return <div>
-      <Button
+  if (resourceMode) {
+    return (
+      <div>
+        <Button
           style={{ margin: "8px", display: "block", marginRight: "auto" }}
           variant="contained"
           color="primary"
@@ -108,40 +122,30 @@ function PackagePage() {
         >
           Go back
         </Button>
-      <ResourcePage data={{NLGData: packageNLGData, resourceName:rowData.data.name, yearFormat:rowData.data.description, resourceId: rowData.data.id, displayData:packageDisplayData }}></ResourcePage>
-    </div>
+        <ResourcePage
+          data={{
+            NLGData: packageNLGData,
+            resourceName: rowData.data.name,
+            yearFormat: rowData.data.description,
+            resourceId: rowData.data.id,
+            displayData: packageDisplayData,
+          }}
+        ></ResourcePage>
+      </div>
+    );
   }
   return (
     <div className="App">
-      <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
-        <Alert onClose={closeWarning} severity="error">
-          Please enter correct package id
-        </Alert>
-      </Snackbar>
-      <FormGroup>
-        <FormControl>
-          <TextField
-            id="private-event-name"
-            label="Enter Dataset(package) ID"
-            onChange={(e) => {
-              setPackageId(e.target.value.trim());
-            }}
-            defaultValue="17010_1_c-single-parent-families-with-children-aged-0-17-years--count--by-race-ethnicity"
-          />
-        </FormControl>
-        <FormControl>
-          <Button
-            style={{ margin: "8px", display: "block", marginRight: "auto" }}
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              fetchCkanData();
-            }}
-          >
-            Fetch Datasets
-          </Button>
-        </FormControl>
-      </FormGroup>
+      <div style={{margin:"8px",display:"block",textAlign:"center"}}>
+        <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
+          <Alert onClose={closeWarning} severity="error">
+            Please enter correct package id
+          </Alert>
+        </Snackbar>
+        <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
+          {title}
+        </Typography>
+      </div>
       <div style={{ height: 400, width: "100%" }}>
         <DataGrid
           rows={rows}
@@ -153,18 +157,18 @@ function PackagePage() {
             setRowData(rowData);
           }}
         />
-        <Button
-          style={{ margin: "8px", display: "block", marginLeft: "auto" }}
-          variant="contained"
-          color="primary"
-          disabled={!(rowData && rowData.isSelected)}
-          onClick={() => {
-            setResourceMode(true);
-          }}
-        >
-          Show Tabular content
-        </Button>
       </div>
+      <Button
+        style={{ margin: "8px", display: "block", marginLeft: "auto" }}
+        variant="contained"
+        color="primary"
+        disabled={!(rowData && rowData.isSelected)}
+        onClick={() => {
+          setResourceMode(true);
+        }}
+      >
+        Get Dataset
+      </Button>
     </div>
   );
 }

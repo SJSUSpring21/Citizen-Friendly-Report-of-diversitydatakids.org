@@ -517,7 +517,7 @@ function ResourcePage(props) {
             onFilterTextChange(newInputValue);
           }}
           renderInput={(params) => (
-            <TextField {...params} label="Combo box" variant="outlined" />
+            <TextField {...params} label="Combo box"/>
           )}
         />
         <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
