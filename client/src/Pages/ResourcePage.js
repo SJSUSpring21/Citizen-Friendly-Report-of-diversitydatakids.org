@@ -151,7 +151,6 @@ function ResourcePage(props) {
   };
 
   const fetchStatistics = () => {
-    // let statUrl = "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT name, year, total_est from \""+resourceId+"\" where total_est = (SELECT aggregation(total_est) from \""+resourceId+"\")"
     let url =
       'https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT min(total_est),max(total_est),avg(total_est) from "' +
       resourceId +
@@ -387,17 +386,24 @@ function ResourcePage(props) {
                     title: field.info.label.split(";")[1],
                     visible: true,
                   };
+                  return {
+                    name: field.id,
+                    header: field.info.label
+                      .split(";")[1]
+                      .replace("Census", ""),
+                    minWidth: 150,
+                  };
                 } else {
                   columnMap[field.id] = {
                     title: field.info.label,
                     visible: true,
                   };
+                  return {
+                    name: field.id,
+                    header: field.info.label.replace("Census", ""),
+                    minWidth: 150,
+                  };
                 }
-                return {
-                  name: field.id,
-                  header: label,
-                  minWidth: 150,
-                };
               } else {
                 columnMap[field.id] = { title: "id", visible: true };
                 return { name: field.id, header: "id", visible: false };
@@ -421,7 +427,6 @@ function ResourcePage(props) {
   };
 
   const setVisibleData = (columnMap) => {
-    // let data = {}, info = {};
     for (const [key, value] of Object.entries(columnMap)) {
       if (
         key === "_id" ||
@@ -487,7 +492,7 @@ function ResourcePage(props) {
         setMessage("NLG is not supported for this kind of dataset");
       }
     },
-    [supported, NLGData, infoMap, visibleMap, stats]
+    [supported, NLGData, infoMap, visibleMap, stats, resourceName]
   );
 
   let CustomTooltip = ({ active, payload, label }) => {
