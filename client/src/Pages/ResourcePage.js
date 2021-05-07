@@ -28,6 +28,8 @@ import {
 } from "recharts";
 import { PieChart, Pie } from "recharts";
 import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -82,21 +84,34 @@ function ResourcePage(props) {
     fetchStats();
   }, [props]);
 
-  const createUrlFilters = () => {
-    const base =
-      "https://data.diversitydatakids.org/api/3/action/datastore_search";
-    myUrl = new URL(base);
-    myUrl.searchParams.append("offset", 0);
-    myUrl.searchParams.append("fields", "name");
-    myUrl.searchParams.append("distinct", "true");
-    myUrl.searchParams.append("include_total", "false");
-    myUrl.searchParams.append("resource_id", resourceId);
+  const createUrlFilters = (filter) => {
+    if (!filter) {
+      const base =
+        "https://data.diversitydatakids.org/api/3/action/datastore_search";
+      myUrl = new URL(base);
+      myUrl.searchParams.append("offset", 0);
+      myUrl.searchParams.append("fields", "name");
+      myUrl.searchParams.append("distinct", "true");
+      myUrl.searchParams.append("include_total", "false");
+      myUrl.searchParams.append("resource_id", resourceId);
+    } else {
+      const base =
+        "https://data.diversitydatakids.org/api/3/action/datastore_search";
+      myUrl = new URL(base);
+      myUrl.searchParams.append("offset", 0);
+      myUrl.searchParams.append("fields", "name");
+      myUrl.searchParams.append("distinct", "true");
+      myUrl.searchParams.append("include_total", "false");
+      myUrl.searchParams.append("resource_id", resourceId);
+      myUrl.searchParams.append("q", '{ "name": "' + filter + ':*"}');
+    }
   };
 
-  const handleChangeNameFilter = (e) => {
-    fetchRegionalStats(e.target.value);
-    fetchCkanData(e.target.value);
-    setName(e.target.value);
+  const handleChangeNameFilter = (value) => {
+    console.log(value);
+    fetchRegionalStats(value);
+    fetchCkanData(value);
+    setName(value);
     setMessage("");
   };
 
@@ -109,12 +124,12 @@ function ResourcePage(props) {
     myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
   };
 
-  const fetchFilterData = () => {
+  const fetchFilterData = (filter) => {
     if (resourceId === "") {
       setWarning(true);
       return;
     }
-    createUrlFilters();
+    createUrlFilters(filter);
     setLoading(true);
     jsonp(myUrl.toString(), null, function (err, res) {
       if (err) {
@@ -124,10 +139,12 @@ function ResourcePage(props) {
         let name_filter = res.result.records.map((record) => {
           return record.name;
         });
-        fetchRegionalStats(name_filter[0]);
-        setName(name_filter[0]);
-        fetchCkanData(name_filter[0]);
-        setNameFilter(name_filter);
+        if (filter == undefined) {
+          fetchRegionalStats(name_filter[0]);
+          setName(name_filter[0]);
+          fetchCkanData(name_filter[0]);
+          setNameFilter(name_filter);
+        }
       }
     });
   };
@@ -211,6 +228,41 @@ function ResourcePage(props) {
   };
 
   const fetchEthnicStats = (titles, query) => {
+    // const base =
+    //   "https://data.diversitydatakids.org/api/3/action/datastore_search";
+    // let url = new URL(base);
+    // let titles = {};
+    // url.searchParams.append("limit", 0);
+    // url.searchParams.append("resource_id", resourceId);
+    // jsonp(url.toString(), null, function (err, res) {
+    //   if (err) {
+    //     setWarning(true);
+    //   } else {
+    // let isSupported = false;
+    // let stats = res.result.fields
+    //   .filter((each) => {
+    //     if (each.id && each.id === "total_est") {
+    //       isSupported = true;
+    //     }
+    //     if (
+    //       (!each.info ||
+    //         !each.info.notes.includes(
+    //           "(only available in download file)"
+    //         )) &&
+    //       each.type === "numeric" &&
+    //       each.id !== "total_est"
+    //     ) {
+    //       return true;
+    //     }
+    //   })
+    //   .map((each) => {
+    //     titles[each.id] = each.info.label.split(";")[1]
+    //       ? each.info.label.split(";")[1]
+    //       : each.info.label.split(";")[0];
+    //     return "avg(" + each.id + ") as avg_" + each.id;
+    //   })
+    //   .join();
+    // if (isSupported) {
     let url =
       "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
       query +
@@ -236,6 +288,9 @@ function ResourcePage(props) {
         }
       }
     });
+    // }
+    //   }
+    // });
   };
 
   const fetchRegionalStats = (filter) => {
@@ -485,26 +540,32 @@ function ResourcePage(props) {
       }
     });
   };
+
+  const onFilterTextChange = (value) => {
+    fetchFilterData(value);
+  };
   return (
     <div className="App">
-      <div className="name-filter-div " style={{display:"flex"}}>
-        <FormControl style={{marginBottom:"8px"}}>
-          <InputLabel id="demo-simple-select-label">Select Region</InputLabel>
-          <Select
-            className="filter"
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={name}
-            onChange={handleChangeNameFilter}
-          >
-            {name_filter.map((value) => (
-              <MenuItem value={value}>{value}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Typography variant="h6" gutterBottom style={{margin:"auto"}}>
-            {displayData.title}
-          </Typography>
+      <div id="title" style={{display:"flex"}}>
+        <Autocomplete
+          id="combo-box-demo"
+          options={name_filter}
+          getOptionLabel={(option) => option}
+          style={{ width: 300 }}
+          value={name}
+          onChange={(event, newValue) => {
+            handleChangeNameFilter(newValue);
+          }}
+          onInputChange={(event, newInputValue) => {
+            onFilterTextChange(newInputValue);
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Combo box" variant="outlined" />
+          )}
+        />
+        <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
+          {displayData.title}
+        </Typography>
       </div>
       <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
         <Alert onClose={closeWarning} severity="error">
