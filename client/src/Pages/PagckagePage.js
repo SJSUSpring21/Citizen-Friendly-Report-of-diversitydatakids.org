@@ -5,6 +5,7 @@ import {
   Button,
   FormControl,
   FormGroup,
+  IconButton,
   Snackbar,
   TextField,
   Typography,
@@ -12,6 +13,7 @@ import {
 import Alert from "@material-ui/lab/Alert";
 import ResourcePage from "./ResourcePage";
 import { useLocation } from "react-router";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -112,7 +114,7 @@ function PackagePage(params) {
   if (resourceMode) {
     return (
       <div>
-        <Button
+        {/* <Button
           style={{ margin: "8px", display: "block", marginRight: "auto" }}
           variant="contained"
           color="primary"
@@ -121,7 +123,16 @@ function PackagePage(params) {
           }}
         >
           Go back
-        </Button>
+        </Button> */}
+        <IconButton style={{position:"absolute"}}
+          // className={classes.iconButton}
+          aria-label="Back"
+          onClick={(e) => {
+            setResourceMode(false);
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
         <ResourcePage
           data={{
             NLGData: packageNLGData,

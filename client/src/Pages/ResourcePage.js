@@ -503,7 +503,7 @@ function ResourcePage(props) {
   };
   return (
     <div className="App">
-      <div id="title" style={{display:"flex"}}>
+      <div id="title" style={{ marginLeft:"48px", display: "flex" }}>
         <Autocomplete
           id="combo-box-demo"
           options={name_filter}
@@ -516,9 +516,7 @@ function ResourcePage(props) {
           onInputChange={(event, newInputValue) => {
             onFilterTextChange(newInputValue);
           }}
-          renderInput={(params) => (
-            <TextField {...params} label="Combo box"/>
-          )}
+          renderInput={(params) => <TextField {...params} label="Select Region" />}
         />
         <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
           {displayData.title}
@@ -532,7 +530,7 @@ function ResourcePage(props) {
       <div>
         <ReactDataGrid
           idProperty="_id"
-          minRowHeight = "100"
+          minRowHeight="100"
           columns={columns}
           dataSource={rows}
           style={gridStyle}
@@ -541,8 +539,8 @@ function ResourcePage(props) {
           // onColumnVisibleChange={onColumnVisibleChange}
           selected={selected}
           pagination
-          limit = {10}
-          pageSizes = {[5,10,20,50]}
+          limit={10}
+          pageSizes={[5, 10, 20, 50]}
           // pagination="remote"
           // limit={pageSize}
         />
