@@ -73,12 +73,12 @@ function ResourcePage(props) {
   });
   const [overview, setOverview] = useState("");
   const [ethnicStats, setEthnicStats] = useState("");
+  const [regionalStats, setRegionalStats] = useState("");
   let myUrl = "";
 
   useEffect(() => {
     fetchFilterData();
-    fetchStatistics();
-    fetchEthnicStats();
+    fetchStats();
   }, [props]);
 
   const createUrlFilters = () => {
@@ -93,15 +93,17 @@ function ResourcePage(props) {
   };
 
   const handleChangeNameFilter = (e) => {
+    fetchRegionalStats(e.target.value);
     fetchCkanData(e.target.value);
     setName(e.target.value);
+    setMessage("");
   };
 
   const createUrl = (filter) => {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     myUrl = new URL(base);
-    myUrl.searchParams.append("limit",pageSize);
+    myUrl.searchParams.append("limit", pageSize);
     myUrl.searchParams.append("resource_id", resourceId);
     myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
   };
@@ -123,6 +125,7 @@ function ResourcePage(props) {
         let name_filter = res.result.records.map((record) => {
           return record.name;
         });
+        fetchRegionalStats(name_filter[0]);
         setName(name_filter[0]);
         fetchCkanData(name_filter[0]);
         setNameFilter(name_filter);
@@ -156,7 +159,7 @@ function ResourcePage(props) {
     });
   };
 
-  const fetchEthnicStats = () => {
+  const fetchStats = () =>{
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     let url = new URL(base);
@@ -167,8 +170,12 @@ function ResourcePage(props) {
       if (err) {
         setWarning(true);
       } else {
-        let stats = res.result.fields
+        let isSupported = false;
+        let query = res.result.fields
           .filter((each) => {
+            if (each.id && each.id === "total_est") {
+              isSupported = true;
+            }
             if (
               (!each.info ||
                 !each.info.notes.includes(
@@ -181,14 +188,59 @@ function ResourcePage(props) {
             }
           })
           .map((each) => {
-            titles[each.id] = each.info.label.split(";")[1] ? each.info.label.split(";")[1] : each.info.label.split(";")[0];
+            titles[each.id] = each.info.label.split(";")[1]
+              ? each.info.label.split(";")[1]
+              : each.info.label.split(";")[0];
             return "avg(" + each.id + ") as avg_" + each.id;
           })
           .join();
-        if (stats.length > 0) {
+          if(isSupported){
+            fetchStatistics();
+            fetchEthnicStats(titles,query);
+          }
+        }
+      });
+  }
+
+  const fetchEthnicStats = (titles,query) => {
+    // const base =
+    //   "https://data.diversitydatakids.org/api/3/action/datastore_search";
+    // let url = new URL(base);
+    // let titles = {};
+    // url.searchParams.append("limit", 0);
+    // url.searchParams.append("resource_id", resourceId);
+    // jsonp(url.toString(), null, function (err, res) {
+    //   if (err) {
+    //     setWarning(true);
+    //   } else {
+        // let isSupported = false;
+        // let stats = res.result.fields
+        //   .filter((each) => {
+        //     if (each.id && each.id === "total_est") {
+        //       isSupported = true;
+        //     }
+        //     if (
+        //       (!each.info ||
+        //         !each.info.notes.includes(
+        //           "(only available in download file)"
+        //         )) &&
+        //       each.type === "numeric" &&
+        //       each.id !== "total_est"
+        //     ) {
+        //       return true;
+        //     }
+        //   })
+        //   .map((each) => {
+        //     titles[each.id] = each.info.label.split(";")[1]
+        //       ? each.info.label.split(";")[1]
+        //       : each.info.label.split(";")[0];
+        //     return "avg(" + each.id + ") as avg_" + each.id;
+        //   })
+        //   .join();
+        // if (isSupported) {
           let url =
             "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
-            stats +
+            query +
             ' from "' +
             resourceId +
             '"';
@@ -196,16 +248,88 @@ function ResourcePage(props) {
             if (err) {
               setWarning(true);
             } else {
-              if(res.success){
+              if (res.success) {
                 let data = res.result.records[0];
-                Axios.post("http://localhost:5000/getEthnicStats", {
+                Object.keys(data).length > 1 &&
+                  Axios.post("http://localhost:5000/getEthnicStats", {
+                    NLGData: NLGData,
+                    data: data,
+                    titles: titles,
+                  })
+                    .then((result) => {
+                      setEthnicStats(result.data);
+                    })
+                    .catch((error) => {});
+              }
+            }
+          });
+        // }
+    //   }
+    // });
+  };
+
+  const fetchRegionalStats = (filter) => {
+    const base =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search";
+    let url = new URL(base);
+    let titles = {};
+    url.searchParams.append("limit", 0);
+    url.searchParams.append("resource_id", resourceId);
+    jsonp(url.toString(), null, function (err, res) {
+      if (err) {
+        setWarning(true);
+      } else {
+        let isSupported = false;
+        let query = res.result.fields
+          .filter((each) => {
+            if (each.id && each.id === "total_est") {
+              isSupported = true;
+            }
+            if (
+              (!each.info ||
+                !each.info.notes.includes(
+                  "(only available in download file)"
+                )) &&
+              each.type === "numeric"
+            ) {
+              return true;
+            }
+          })
+          .map((each) => {
+            titles[each.id] = each.info.label.split(";")[1]
+              ? each.info.label.split(";")[1]
+              : each.info.label.split(";")[0];
+            return "avg(" + each.id + ") as avg_" + each.id;
+          })
+          .join();
+        if (isSupported) {
+          query =
+            query +
+            ",min(total_est) as min_total_est, max(total_est) as max_total_est";
+          let url =
+            "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
+            query +
+            ' from "' +
+            resourceId +
+            "\" where name='" +
+            filter +
+            "'";
+          jsonp(url, null, function (err, res) {
+            if (err) {
+              setWarning(true);
+            } else {
+              if (res.success) {
+                let data = res.result.records[0];
+                Axios.post("http://localhost:5000/getRegionalStats", {
                   NLGData: NLGData,
                   data: data,
-                  titles:titles,
-                }).then((result) => {
-                  setEthnicStats(result.data);
-                }).catch((error)=>{
-                });
+                  titles: titles,
+                  filter: filter,
+                })
+                  .then((result) => {
+                    setRegionalStats(result.data);
+                  })
+                  .catch((error) => {});
               }
             }
           });
@@ -220,7 +344,7 @@ function ResourcePage(props) {
       return;
     }
     createUrl(filter);
-    setLoading(true); 
+    setLoading(true);
     jsonp(myUrl.toString(), null, function (err, res) {
       let label = "";
       if (err) {
@@ -525,9 +649,13 @@ function ResourcePage(props) {
           )}
         </div>
         <div>
-          <div>{overview}</div>
-          <div>{ethnicStats}</div>
-          <div>{message}</div>
+          <div>
+            {overview.replace("<p>", "").replace("</p>", "")}{" "}
+            {ethnicStats.replace("<p>", "").replace("</p>", "")}
+          </div>
+
+          <div>{regionalStats.replace("<p>", "").replace("</p>", "")}</div>
+          <div>{message.replace("<p>", "").replace("</p>", "")}</div>
         </div>
       </div>
     </div>

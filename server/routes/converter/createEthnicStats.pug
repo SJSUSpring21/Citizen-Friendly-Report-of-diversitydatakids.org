@@ -6,7 +6,8 @@ mixin percent
 
 p
     //- | the overall #[+Average] for #[+each] #[+race] is #[+around] #{parseFloat(avg).toFixed(2)}. 
-    | Of all the #[+races],
+    if(min !== -1)
+    | Also, the
     eachz el in maxArray with {separator:',', last_separator:'and'}
         | #{el}
     | 

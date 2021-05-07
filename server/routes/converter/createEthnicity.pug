@@ -26,7 +26,7 @@ mixin percent
         |%
 
 mixin intro
-    | In the #{info.name.data} 
+    //- | In the #{info.name.data} 
     if(info.year.data.includes("-"))
         | #[+multiYear]
     else 
@@ -92,7 +92,7 @@ mixin compare
         if(info.total_est.data < stats.avg)
             | this #{NLG.Scale[0]} is #[+lower] than the #{resourceName.split("(")[0]} #[+Average]
             | by a value of #{parseFloat(stats.avg - info.total_est.data).toFixed(2)} #[+percent].
-        else 
+        if(info.total_est.data === stats.avg) 
             | this #{NLG.Scale[0]} is same as the #{resourceName.split("(")[0]} #[+Average].
 
 //- ----------------------------------
