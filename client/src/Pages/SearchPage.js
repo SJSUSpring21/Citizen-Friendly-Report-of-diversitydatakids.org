@@ -4,7 +4,6 @@ import { withStyles, makeStyles } from "@material-ui/core/styles";
 
 import SearchIcon from "@material-ui/icons/Search";
 import {
-  Button,
   IconButton,
   InputBase,
   Paper,
@@ -14,6 +13,7 @@ import {
 import Alert from "@material-ui/lab/Alert";
 import Axios from "axios";
 import { Link } from "react-router-dom";
+import { PolarAngleAxis } from "recharts";
 
 const useStylesBootstrap = makeStyles((theme) => ({
   arrow: {
@@ -66,7 +66,16 @@ function SearchPage() {
       field: "title",
       headerName: "Dataset Name",
       headerClassName: "grid-header",
-      flex: 400,
+      flex: 300,
+      renderCell: (params) => {
+        return (
+          <div>
+          <Link style={{marginLeft:"auto"}} to={"/packages?id=" + params.getValue("id") } target="_blank" >
+          {params.value}
+        </Link>
+        </div>
+        );
+      },
     },
     {
       field: "notes",
@@ -77,9 +86,9 @@ function SearchPage() {
         return (
           <BootstrapTooltip
             title={params.value}
-            style={{ overflow: "hidden", minWidth: "100%" }}
+            style={{ overflow: "hidden", Width: "95%" }}
           >
-            <span className="table-cell-trucate">{params.value}</span>
+            <span className="table-cell-trucate" style={{textOverflow:"ellipsis"}}>{params.value}</span>
           </BootstrapTooltip>
         );
       },
@@ -129,6 +138,12 @@ function SearchPage() {
           onChange={(e) => {
             setInput(e.target.value);
           }}
+          onKeyDown={(e)=>{
+            if(e.key === "Enter"){
+              e.preventDefault();
+              fetchCkanData();
+            }
+          }}
         />
         <IconButton
           className={classes.iconButton}
@@ -148,24 +163,25 @@ function SearchPage() {
           </Alert>
         </Snackbar>
       </div>
-      <div style={{ height: 400, width: "100%" }}>
+      <div style={{ width: "100%" }}>
         <DataGrid
           rows={rows}
           columns={columns}
           loading={loading}
           getRowId={(row) => row.id}
           pageSize={20}
+          autoHeight = {true}
           onRowSelected={(e) => {
             setRowData(e.data);
             setIsSelected(e.isSelected)
           }}
         />
       </div>
-      <div style={{margin:"16px",display:"flex"}} >
+      {/* <div style={{margin:"16px",display:"flex"}} >
       {isSelected && <Link style={{marginLeft:"auto"}} to={"/packages?id=" + rowData.id } >
           Show Geographic datasets
         </Link>}
-      </div>
+      </div> */}
       
     </div>
   );

@@ -527,7 +527,7 @@ function ResourcePage(props) {
           Unable to fectch data
         </Alert>
       </Snackbar>
-      <div>
+      <div style={{marginTop:"8px"}}>
         <ReactDataGrid
           idProperty="_id"
           minRowHeight="100"
