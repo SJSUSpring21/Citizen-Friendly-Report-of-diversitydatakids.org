@@ -11,8 +11,8 @@ function App() {
   const DefaultContainer = () => (
     <div>
       <NavigationBar />
-      <Route path="/" exact component={Dashboard} />
-      <Route path="/packages" exact component={PackagePage} />
+      {/* <Route path="/" exact component={Dashboard} /> */}
+      <Route path="/" exact component={PackagePage} />
     </div>
   );
 

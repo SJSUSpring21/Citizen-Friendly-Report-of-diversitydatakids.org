@@ -14,19 +14,19 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import "./ResourcePage.css";
+import Spinner from "react-bootstrap/Spinner";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
+  Label,
 } from "recharts";
-import { PureComponent } from "react";
-import { PieChart, Pie, Sector } from "recharts";
+import { PieChart, Pie } from "recharts";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -66,6 +66,7 @@ function ResourcePage(props) {
   const [graphState, setGraphState] = useState([]);
   const [name_filter, setNameFilter] = useState([]);
   const [name, setName] = useState("");
+  const [loadingStats, setLoadingStats] = useState(false);
   const [stats, setStats] = useState({
     min: -1,
     max: -1,
@@ -116,9 +117,7 @@ function ResourcePage(props) {
     createUrlFilters();
     setLoading(true);
     jsonp(myUrl.toString(), null, function (err, res) {
-      let label = "";
       if (err) {
-        setWarning(true);
         setLoading(false);
         return;
       } else {
@@ -141,6 +140,7 @@ function ResourcePage(props) {
     jsonp(url, null, function (err, res) {
       if (err) {
         setWarning(true);
+        setLoadingStats(false);
       } else {
         let data = res.result.records[0];
         if (data && res.success) {
@@ -150,15 +150,21 @@ function ResourcePage(props) {
             stats: { min: data.min, max: data.max, avg: data.avg },
             resourceName: resourceName,
             yearFormat: yearFormat,
-          }).then((result) => {
-            setOverview(result.data);
-          });
+          })
+            .then((result) => {
+              setLoadingStats(false);
+              setOverview(result.data);
+            })
+            .catch((error) => {
+              setLoadingStats(false);
+            });
         }
       }
     });
   };
 
   const fetchStats = () => {
+    setLoadingStats(true);
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     let url = new URL(base);
@@ -167,7 +173,8 @@ function ResourcePage(props) {
     url.searchParams.append("resource_id", resourceId);
     jsonp(url.toString(), null, function (err, res) {
       if (err) {
-        setWarning(true);
+        setLoadingStats(false);
+        setLoadingStats(false);
       } else {
         let isSupported = false;
         let query = res.result.fields
@@ -196,6 +203,8 @@ function ResourcePage(props) {
         if (isSupported) {
           fetchStatistics();
           fetchEthnicStats(titles, query);
+        } else {
+          setLoadingStats(false);
         }
       }
     });
@@ -333,8 +342,10 @@ function ResourcePage(props) {
                   };
                   return {
                     name: field.id,
-                    header: field.info.label.split(";")[1].replace("Census",""),
-                    minWidth: 150,
+                    header: field.info.label
+                      .split(";")[1]
+                      .replace("Census", ""),
+                    minWidth: 200,
                   };
                 } else {
                   columnMap[field.id] = {
@@ -343,8 +354,8 @@ function ResourcePage(props) {
                   };
                   return {
                     name: field.id,
-                    header: field.info.label.replace("Census",""),
-                    minWidth: 150,
+                    header: field.info.label.replace("Census", ""),
+                    minWidth: 200,
                   };
                 }
               } else {
@@ -430,9 +441,11 @@ function ResourcePage(props) {
             setGraphState(graphData);
             setMessage(result.data);
           })
-          .catch((error) => {});
+          .catch((error) => {
+            setMessage("");
+          });
       } else {
-        setMessage("NLG is not supported for this kind of dataset");
+        setMessage("NLG is not supported for this dataset");
       }
     },
     [supported, NLGData, infoMap, visibleMap, stats, resourceName]
@@ -474,9 +487,9 @@ function ResourcePage(props) {
   };
   return (
     <div className="App">
-      <div className="name-filter-div">
-        <FormControl>
-          <InputLabel id="demo-simple-select-label">Name</InputLabel>
+      <div className="name-filter-div " style={{display:"flex"}}>
+        <FormControl style={{marginBottom:"8px"}}>
+          <InputLabel id="demo-simple-select-label">Select Region</InputLabel>
           <Select
             className="filter"
             labelId="demo-simple-select-label"
@@ -489,15 +502,15 @@ function ResourcePage(props) {
             ))}
           </Select>
         </FormControl>
+        <Typography variant="h6" gutterBottom style={{margin:"auto"}}>
+            {displayData.title}
+          </Typography>
       </div>
       <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
         <Alert onClose={closeWarning} severity="error">
-          Please enter correct resource id
+          Unable to fectch data
         </Alert>
       </Snackbar>
-      <Typography variant="h4" gutterBottom>
-        {displayData.title}
-      </Typography>
       <div>
         <ReactDataGrid
           idProperty="_id"
@@ -514,7 +527,18 @@ function ResourcePage(props) {
         />
       </div>
       <div style={{ display: "flex" }}>
-        <div>
+        <div style={{ margin: "8px" }}>
+          {supported && message !== "" && (
+            <div>
+              <Typography variant="h6" gutterBottom>
+                Selcted Record data:
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                {message.replace("<p>", "").replace("</p>", "")}
+              </Typography>
+            </div>
+          )}
+
           {message.length && (
             <React.Fragment>
               <div className={classes.root}>
@@ -567,6 +591,7 @@ function ResourcePage(props) {
               </div>
 
               <CssBaseline />
+
               <Container
                 maxWidth="sm"
                 className={chart == "pie" ? "pie" : "bar"}
@@ -574,7 +599,7 @@ function ResourcePage(props) {
                 {chart == "bar" && (
                   <BarChart
                     width={500}
-                    height={300}
+                    height={200}
                     data={graphState}
                     margin={{
                       top: 5,
@@ -613,15 +638,45 @@ function ResourcePage(props) {
             </React.Fragment>
           )}
         </div>
-        <div>
-          <div>
-            {overview.replace("<p>", "").replace("</p>", "")}{" "}
-            {ethnicStats.replace("<p>", "").replace("</p>", "")}
-          </div>
-
-          <div>{regionalStats.replace("<p>", "").replace("</p>", "")}</div>
-          <div>{message.replace("<p>", "").replace("</p>", "")}</div>
+        <div id="loadingNLG" style={{ margin: "8px", display: "block" }}>
+          {loadingStats && (
+            <div style={{ display: "flex" }}>
+              <Spinner
+                as="span"
+                animation="grow"
+                size="m"
+                role="status"
+                aria-hidden="true"
+              />
+              <div style={{ margin: "auto" }}>
+                Generating Natural Language...
+              </div>
+            </div>
+          )}
         </div>
+        {supported && !loadingStats && (
+          <div style={{ margin: "8px" }}>
+            <div id="overview">
+              <Typography variant="h6" gutterBottom>
+                Do you know ?
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                {overview.replace("<p>", "").replace("</p>", "")}{" "}
+                {ethnicStats.replace("<p>", "").replace("</p>", "")}
+              </Typography>
+            </div>
+            <div id="regional">
+              <Typography variant="h6" gutterBottom>
+                Geographic Data:
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                {regionalStats.replace("<p>", "").replace("</p>", "")}
+              </Typography>
+            </div>
+
+            {/* <div>{message.replace("<p>", "").replace("</p>", "")}</div> */}
+          </div>
+        )}
       </div>
     </div>
   );
