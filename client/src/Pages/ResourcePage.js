@@ -134,7 +134,6 @@ function ResourcePage(props) {
   };
 
   const fetchStatistics = () => {
-    // let statUrl = "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT name, year, total_est from \""+resourceId+"\" where total_est = (SELECT aggregation(total_est) from \""+resourceId+"\")"
     let url =
       'https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT min(total_est),max(total_est),avg(total_est) from "' +
       resourceId +
@@ -159,7 +158,7 @@ function ResourcePage(props) {
     });
   };
 
-  const fetchStats = () =>{
+  const fetchStats = () => {
     const base =
       "https://data.diversitydatakids.org/api/3/action/datastore_search";
     let url = new URL(base);
@@ -194,78 +193,40 @@ function ResourcePage(props) {
             return "avg(" + each.id + ") as avg_" + each.id;
           })
           .join();
-          if(isSupported){
-            fetchStatistics();
-            fetchEthnicStats(titles,query);
-          }
+        if (isSupported) {
+          fetchStatistics();
+          fetchEthnicStats(titles, query);
         }
-      });
-  }
+      }
+    });
+  };
 
-  const fetchEthnicStats = (titles,query) => {
-    // const base =
-    //   "https://data.diversitydatakids.org/api/3/action/datastore_search";
-    // let url = new URL(base);
-    // let titles = {};
-    // url.searchParams.append("limit", 0);
-    // url.searchParams.append("resource_id", resourceId);
-    // jsonp(url.toString(), null, function (err, res) {
-    //   if (err) {
-    //     setWarning(true);
-    //   } else {
-        // let isSupported = false;
-        // let stats = res.result.fields
-        //   .filter((each) => {
-        //     if (each.id && each.id === "total_est") {
-        //       isSupported = true;
-        //     }
-        //     if (
-        //       (!each.info ||
-        //         !each.info.notes.includes(
-        //           "(only available in download file)"
-        //         )) &&
-        //       each.type === "numeric" &&
-        //       each.id !== "total_est"
-        //     ) {
-        //       return true;
-        //     }
-        //   })
-        //   .map((each) => {
-        //     titles[each.id] = each.info.label.split(";")[1]
-        //       ? each.info.label.split(";")[1]
-        //       : each.info.label.split(";")[0];
-        //     return "avg(" + each.id + ") as avg_" + each.id;
-        //   })
-        //   .join();
-        // if (isSupported) {
-          let url =
-            "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
-            query +
-            ' from "' +
-            resourceId +
-            '"';
-          jsonp(url, null, function (err, res) {
-            if (err) {
-              setWarning(true);
-            } else {
-              if (res.success) {
-                let data = res.result.records[0];
-                Object.keys(data).length > 1 &&
-                  Axios.post("http://localhost:5000/getEthnicStats", {
-                    NLGData: NLGData,
-                    data: data,
-                    titles: titles,
-                  })
-                    .then((result) => {
-                      setEthnicStats(result.data);
-                    })
-                    .catch((error) => {});
-              }
-            }
-          });
-        // }
-    //   }
-    // });
+  const fetchEthnicStats = (titles, query) => {
+    let url =
+      "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
+      query +
+      ' from "' +
+      resourceId +
+      '"';
+    jsonp(url, null, function (err, res) {
+      if (err) {
+        setWarning(true);
+      } else {
+        if (res.success) {
+          let data = res.result.records[0];
+          Object.keys(data).length > 1 &&
+            Axios.post("http://localhost:5000/getEthnicStats", {
+              NLGData: NLGData,
+              data: data,
+              titles: titles,
+            })
+              .then((result) => {
+                setEthnicStats(result.data);
+              })
+              .catch((error) => {});
+        }
+      }
+    });
   };
 
   const fetchRegionalStats = (filter) => {
@@ -370,17 +331,22 @@ function ResourcePage(props) {
                     title: field.info.label.split(";")[1],
                     visible: true,
                   };
+                  return {
+                    name: field.id,
+                    header: field.info.label.split(";")[1].replace("Census",""),
+                    minWidth: 150,
+                  };
                 } else {
                   columnMap[field.id] = {
                     title: field.info.label,
                     visible: true,
                   };
+                  return {
+                    name: field.id,
+                    header: field.info.label.replace("Census",""),
+                    minWidth: 150,
+                  };
                 }
-                return {
-                  name: field.id,
-                  header: label,
-                  minWidth: 150,
-                };
               } else {
                 columnMap[field.id] = { title: "id", visible: true };
                 return { name: field.id, header: "id", visible: false };
@@ -404,7 +370,6 @@ function ResourcePage(props) {
   };
 
   const setVisibleData = (columnMap) => {
-    // let data = {}, info = {};
     for (const [key, value] of Object.entries(columnMap)) {
       if (
         key === "_id" ||
@@ -470,7 +435,7 @@ function ResourcePage(props) {
         setMessage("NLG is not supported for this kind of dataset");
       }
     },
-    [supported, NLGData, infoMap, visibleMap, stats]
+    [supported, NLGData, infoMap, visibleMap, stats, resourceName]
   );
 
   let CustomTooltip = ({ active, payload, label }) => {
