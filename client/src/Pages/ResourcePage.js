@@ -545,6 +545,22 @@ function ResourcePage(props) {
           // limit={pageSize}
         />
       </div>
+      <div id="loadingNLG" style={{ display: "block" , textAlign:"center" }}>
+          {(
+            loadingStats && <div style={{ marginTop:"32px" }}>
+              <Spinner
+                as="span"
+                animation="grow"
+                size="m"
+                role="status"
+                aria-hidden="true"
+              />
+              <div style={{ }}>
+                Generating Natural Language...
+              </div>
+            </div>
+          )}
+        </div>
       <div style={{ display: "flex" }}>
         <div style={{ margin: "8px" }}>
           {supported && message !== "" && (
@@ -657,22 +673,7 @@ function ResourcePage(props) {
             </React.Fragment>
           )}
         </div>
-        <div id="loadingNLG" style={{ margin: "8px", display: "block" }}>
-          {loadingStats && (
-            <div style={{ display: "flex" }}>
-              <Spinner
-                as="span"
-                animation="grow"
-                size="m"
-                role="status"
-                aria-hidden="true"
-              />
-              <div style={{ margin: "auto" }}>
-                Generating Natural Language...
-              </div>
-            </div>
-          )}
-        </div>
+        
         {supported && !loadingStats && (
           <div style={{ margin: "8px" }}>
             <div id="overview">

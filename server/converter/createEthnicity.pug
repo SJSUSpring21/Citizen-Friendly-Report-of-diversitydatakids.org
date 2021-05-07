@@ -87,13 +87,13 @@ mixin avg
 mixin compare 
     if(stats && stats.avg !== -1 && (info.total_est.data !== null))
         if(info.total_est.data > stats.avg)
-            | this #{NLG.Scale[0]} is #[+greater] than the #{resourceName.split("(")[0]} #[+Average]
+            | this #{NLG.Scale[0]} is #[+greater] than all the #{resourceName.split("(")[0]} #[+Average]
             | by a value of #{parseFloat(info.total_est.data - stats.avg).toFixed(2)} #[+percent].
         if(info.total_est.data < stats.avg)
-            | this #{NLG.Scale[0]} is #[+lower] than the #{resourceName.split("(")[0]} #[+Average]
+            | this #{NLG.Scale[0]} is #[+lower] than all the #{resourceName.split("(")[0]} #[+Average]
             | by a value of #{parseFloat(stats.avg - info.total_est.data).toFixed(2)} #[+percent].
         if(info.total_est.data === stats.avg) 
-            | this #{NLG.Scale[0]} is same as the #{resourceName.split("(")[0]} #[+Average].
+            | this #{NLG.Scale[0]} is same as all the #{resourceName.split("(")[0]} #[+Average].
 
 //- ----------------------------------
 

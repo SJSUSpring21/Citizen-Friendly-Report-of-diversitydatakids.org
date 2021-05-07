@@ -84,12 +84,13 @@ function SearchPage() {
       flex: 400,
       renderCell: (params) => {
         return (
-          <BootstrapTooltip
-            title={params.value}
-            style={{ overflow: "hidden", Width: "95%" }}
-          >
-            <span className="table-cell-trucate" style={{textOverflow:"ellipsis"}}>{params.value}</span>
-          </BootstrapTooltip>
+          // <BootstrapTooltip
+          //   title={params.value}
+          //   style={{ overflow: "hidden", Width: "95%" }}
+          // >
+            <span className="table-cell-trucate" style={{textOverflow:"ellipsis",whiteSpace: "initial",
+    lineHeight: "normal",maxHeight:"48px", textOverflow:"ellipsis"}}>{params.value}</span>
+          // </BootstrapTooltip>
         );
       },
     },
@@ -133,7 +134,7 @@ function SearchPage() {
         <InputBase
           type="input"
           className={classes.input}
-          placeholder="Search Datasets"
+          placeholder="Search Datasets..."
           inputProps={{ "aria-label": "search datasets" }}
           onChange={(e) => {
             setInput(e.target.value);

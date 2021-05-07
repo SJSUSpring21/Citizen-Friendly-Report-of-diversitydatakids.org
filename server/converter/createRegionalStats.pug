@@ -6,7 +6,7 @@ mixin percent
 
 p
     | In #{filter}, #[+Average] #{NLG.Scale[0]} of #{NLG.Title} is #{parseFloat(total).toFixed(2)} #[+percent] 
-    | with #{regMin} #[+percent] & #{regMax} #[+percent] as #[+highest] and #[+lowest] values.
+    | with #{regMin} #[+percent] & #{regMax} #[+percent] as the #[+highest] and the #[+lowest] values.
     if(min !== -1)
         |Overall, the
         eachz el in maxArray with {separator:',', last_separator:'and'}
