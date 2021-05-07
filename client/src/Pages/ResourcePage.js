@@ -9,10 +9,6 @@ import Alert from "@material-ui/lab/Alert";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
 import "./ResourcePage.css";
 import Spinner from "react-bootstrap/Spinner";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -24,7 +20,6 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  Label,
 } from "recharts";
 import { PieChart, Pie } from "recharts";
 import { makeStyles } from "@material-ui/core/styles";
@@ -228,41 +223,6 @@ function ResourcePage(props) {
   };
 
   const fetchEthnicStats = (titles, query) => {
-    // const base =
-    //   "https://data.diversitydatakids.org/api/3/action/datastore_search";
-    // let url = new URL(base);
-    // let titles = {};
-    // url.searchParams.append("limit", 0);
-    // url.searchParams.append("resource_id", resourceId);
-    // jsonp(url.toString(), null, function (err, res) {
-    //   if (err) {
-    //     setWarning(true);
-    //   } else {
-    // let isSupported = false;
-    // let stats = res.result.fields
-    //   .filter((each) => {
-    //     if (each.id && each.id === "total_est") {
-    //       isSupported = true;
-    //     }
-    //     if (
-    //       (!each.info ||
-    //         !each.info.notes.includes(
-    //           "(only available in download file)"
-    //         )) &&
-    //       each.type === "numeric" &&
-    //       each.id !== "total_est"
-    //     ) {
-    //       return true;
-    //     }
-    //   })
-    //   .map((each) => {
-    //     titles[each.id] = each.info.label.split(";")[1]
-    //       ? each.info.label.split(";")[1]
-    //       : each.info.label.split(";")[0];
-    //     return "avg(" + each.id + ") as avg_" + each.id;
-    //   })
-    //   .join();
-    // if (isSupported) {
     let url =
       "https://data.diversitydatakids.org/api/3/action/datastore_search_sql?sql=SELECT " +
       query +
@@ -288,9 +248,6 @@ function ResourcePage(props) {
         }
       }
     });
-    // }
-    //   }
-    // });
   };
 
   const fetchRegionalStats = (filter) => {
@@ -575,14 +532,17 @@ function ResourcePage(props) {
       <div>
         <ReactDataGrid
           idProperty="_id"
+          minRowHeight = "100"
           columns={columns}
           dataSource={rows}
           style={gridStyle}
           loading={loading}
           onSelectionChange={onSelectionChange}
-          onColumnVisibleChange={onColumnVisibleChange}
+          // onColumnVisibleChange={onColumnVisibleChange}
           selected={selected}
           pagination
+          limit = {10}
+          pageSizes = {[5,10,20,50]}
           // pagination="remote"
           // limit={pageSize}
         />

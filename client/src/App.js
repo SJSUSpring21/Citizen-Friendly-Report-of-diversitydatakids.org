@@ -6,13 +6,15 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import NavigationBar from "./components/NavBar/NavBar";
 import PackagePage from "./Pages/PagckagePage";
 import ResourcePage from "./Pages/ResourcePage";
+import SearchPage from "./Pages/SearchPage";
 
 function App() {
   const DefaultContainer = () => (
     <div>
       <NavigationBar />
-      {/* <Route path="/" exact component={Dashboard} /> */}
+      <Route path="/delete" exact component={Dashboard} />
       <Route path="/" exact component={PackagePage} />
+      <Route path="/search" exact component={SearchPage} />
     </div>
   );
 

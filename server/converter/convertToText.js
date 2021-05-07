@@ -37,7 +37,7 @@ router.post("/getRowText", (req, res) => {
         }
       }
     }
-    text = rosaenlgPug.renderFile("./routes/converter/createEthnicity.pug", {
+    text = rosaenlgPug.renderFile("./converter/createEthnicity.pug", {
       language: "en_US",
       NLG: NLGData,
       info: info,
@@ -55,7 +55,7 @@ router.post("/getRowText", (req, res) => {
       cache: true,
     });
   } else {
-    text = rosaenlgPug.renderFile("./routes/converter/createEthnicity.pug", {
+    text = rosaenlgPug.renderFile("./converter/createEthnicity.pug", {
       language: "en_US",
       NLG: NLGData,
       info: info,
@@ -71,7 +71,7 @@ router.post("/getRowText", (req, res) => {
 
 router.post("/getOverview", (req, res) => {
   const { NLGData, stats, resourceName, yearFormat } = req.body;
-  let text = rosaenlgPug.renderFile("./routes/converter/createStats.pug", {
+  let text = rosaenlgPug.renderFile("./converter/createStats.pug", {
     language: "en_US",
     NLG: NLGData,
     stats: stats,
@@ -106,7 +106,7 @@ router.post("/getEthnicStats", (req, res) => {
     }
   }
   let text = rosaenlgPug.renderFile(
-    "./routes/converter/createEthnicStats.pug",
+    "./converter/createEthnicStats.pug",
     {
       language: "en_US",
       NLG: NLGData,
@@ -151,7 +151,7 @@ router.post("/getRegionalStats", (req, res) => {
   }
 
   let text = rosaenlgPug.renderFile(
-    "./routes/converter/createRegionalStats.pug",
+    "./converter/createRegionalStats.pug",
     {
       language: "en_US",
       NLG: NLGData,
