@@ -20,4 +20,8 @@
 .MuiToolbar-regular{
   min-height: 48px !important;
 }
+.Headings{
+  color: forestgreen;
+    font-weight: 700;
+}
 * {-webkit-font-smoothing: antialiased;}

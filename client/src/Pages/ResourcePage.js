@@ -373,6 +373,7 @@ function ResourcePage(props) {
                       .split(";")[1]
                       .replace("Census", ""),
                     minWidth: 50,
+                    width:175,
                   };
                 } else {
                   columnMap[field.id] = {
@@ -383,6 +384,7 @@ function ResourcePage(props) {
                     name: field.id,
                     header: field.info.label.replace("Census", ""),
                     minWidth: 50,
+                    width:175,
                   };
                 }
               } else {
@@ -547,6 +549,7 @@ function ResourcePage(props) {
           variant="h6"
           gutterBottom
           style={{ margin: "auto", marginLeft: "32px" }}
+          className = "Headings"
         >
           {displayData.title}
         </Typography>
@@ -591,8 +594,8 @@ function ResourcePage(props) {
         <div style={{ margin: "8px" }}>
           {supported && message !== "" && (
             <div>
-              <Typography variant="h6" gutterBottom>
-                Selcted Record data:
+              <Typography variant="h6" gutterBottom className = "Headings">
+                Seldcted Record data:
               </Typography>
               <Typography variant="body2" gutterBottom>
                 {message}
@@ -647,7 +650,7 @@ function ResourcePage(props) {
         {supported && !loadingStats && (
           <div style={{ margin: "8px" }}>
             <div id="overview">
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom className="Headings">
                 Do you know ?
               </Typography>
               <Typography variant="body2" gutterBottom>
@@ -656,7 +659,7 @@ function ResourcePage(props) {
               </Typography>
             </div>
             <div id="regional">
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom className = "Headings">
                 Geographic Data:
               </Typography>
               <Typography variant="body2" gutterBottom>
