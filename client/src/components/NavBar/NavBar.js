@@ -27,7 +27,7 @@ export default function NavBar() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Citizen-Friendly-Report-of-diversitydatakids.org
+            Citizen Friendly Report of diversitydatakids.org
           </Typography>
         </Toolbar>
       </AppBar>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { DataGrid } from "@material-ui/data-grid";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
-
 import SearchIcon from "@material-ui/icons/Search";
 import {
   IconButton,
@@ -13,7 +12,7 @@ import {
 import Alert from "@material-ui/lab/Alert";
 import Axios from "axios";
 import { Link } from "react-router-dom";
-import { PolarAngleAxis } from "recharts";
+import jsonp from "jsonp";
 
 const useStylesBootstrap = makeStyles((theme) => ({
   arrow: {
@@ -69,11 +68,21 @@ function SearchPage() {
       flex: 300,
       renderCell: (params) => {
         return (
-          <div>
-          <Link style={{marginLeft:"auto"}} to={"/packages?id=" + params.getValue("id") } target="_blank" >
-          {params.value}
-        </Link>
-        </div>
+          <div style={{ textOverflow: "ellipsis",
+          whiteSpace: "initial",
+          lineHeight: "normal",
+          maxHeight: "48px",}}>
+            <Link
+              style={{textOverflow: "ellipsis",
+              whiteSpace: "initial",
+              lineHeight: "normal",
+              maxHeight: "48px",}}
+              to={"/packages?id=" + params.getValue("id")}
+              target="_blank"
+            >
+              {params.value}
+            </Link>
+          </div>
         );
       },
     },
@@ -88,8 +97,17 @@ function SearchPage() {
           //   title={params.value}
           //   style={{ overflow: "hidden", Width: "95%" }}
           // >
-            <span className="table-cell-trucate" style={{textOverflow:"ellipsis",whiteSpace: "initial",
-    lineHeight: "normal",maxHeight:"48px", textOverflow:"ellipsis"}}>{params.value}</span>
+          <span
+            className="table-cell-trucate"
+            style={{
+              textOverflow: "ellipsis",
+              whiteSpace: "initial",
+              lineHeight: "normal",
+              maxHeight: "48px",
+            }}
+          >
+            {params.value}
+          </span>
           // </BootstrapTooltip>
         );
       },
@@ -127,6 +145,11 @@ function SearchPage() {
         setLoading(false);
       });
   };
+  const fetchSubTopics = () => {
+    jsonp("https://data.diversitydatakids.org/api/3/action/package_search?fq=&facet.field=[%22vocab_Subtopic%22]&rows=0", null, function (err, res) {
+
+    });
+  };
   const preventDefault = (event) => event.preventDefault();
   return (
     <div className="App">
@@ -139,8 +162,8 @@ function SearchPage() {
           onChange={(e) => {
             setInput(e.target.value);
           }}
-          onKeyDown={(e)=>{
-            if(e.key === "Enter"){
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
               e.preventDefault();
               fetchCkanData();
             }
@@ -164,17 +187,17 @@ function SearchPage() {
           </Alert>
         </Snackbar>
       </div>
-      <div style={{ width: "100%" }}>
+      <div style={{ height:"500px", width: "100%" }}>
         <DataGrid
           rows={rows}
           columns={columns}
           loading={loading}
           getRowId={(row) => row.id}
           pageSize={20}
-          autoHeight = {true}
+          autoHeight= {false}
           onRowSelected={(e) => {
             setRowData(e.data);
-            setIsSelected(e.isSelected)
+            setIsSelected(e.isSelected);
           }}
         />
       </div>
@@ -183,7 +206,6 @@ function SearchPage() {
           Show Geographic datasets
         </Link>}
       </div> */}
-      
     </div>
   );
 }

@@ -542,7 +542,7 @@ function ResourcePage(props) {
             <TextField {...params} label="Select Region" />
           )}
         />
-        <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
+        <Typography variant="h6" gutterBottom style={{ margin: "auto", marginLeft:"32px"}}>
           {displayData.title}
         </Typography>
       </div>
@@ -563,7 +563,7 @@ function ResourcePage(props) {
           // onColumnVisibleChange={onColumnVisibleChange}
           selected={selected}
           pagination
-          limit={10}
+          // limit={10}
           pageSizes={[5, 10, 20, 50]}
           // pagination="remote"
           // limit={pageSize}
@@ -571,7 +571,7 @@ function ResourcePage(props) {
       </div>
       <div id="loadingNLG" style={{ display: "block", textAlign: "center" }}>
         {loadingStats && (
-          <div style={{ marginTop: "32px" }}>
+          <div style={{ marginTop: "128px" }}>
             <Spinner
               as="span"
               animation="grow"

@@ -3,18 +3,17 @@ import jsonp from "jsonp";
 import { DataGrid } from "@material-ui/data-grid";
 import {
   Button,
-  FormControl,
-  FormGroup,
   IconButton,
   makeStyles,
   Snackbar,
-  TextField,
   Typography,
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import ResourcePage from "./ResourcePage";
 import { useLocation } from "react-router";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import Axios from "axios";
+
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -53,6 +52,7 @@ function PackagePage(params) {
     {
       field: "id",
       headerName: "id",
+      headerClassName: "grid-header",
       hide: true,
     },
     {
@@ -62,6 +62,7 @@ function PackagePage(params) {
       //   return (params.value.split("(")[0]);
       // },
       width: 500,
+      headerClassName: "grid-header",
       renderCell: (params) => {
         return <div className={classes.root}>
         <Button color="primary" onClick={()=>{
@@ -74,6 +75,7 @@ function PackagePage(params) {
     {
       field: "description",
       headerName: "Year info",
+      headerClassName: "grid-header",
       width: 150,
     },
   ];
@@ -105,12 +107,11 @@ function PackagePage(params) {
     }
     createUrl();
     setLoading(true);
-    jsonp(myUrl.toString(), null, function (err, res) {
-      if (err) {
-        setWarning(true);
-        setLoading(false);
-        return;
-      } else {
+    Axios.post("http://localhost:5000/package", {
+      id: id,
+    })
+      .then((result) => {
+        let res = result.data
         setPackageNLGData({
           Scale: res.result.Scale,
           Nativity: res.result.Nativity,
@@ -127,8 +128,36 @@ function PackagePage(params) {
         setTitle(res.result.title);
         setRows(res.result.resources);
         setLoading(false);
-      }
-    });
+      })
+      .catch((err) => {
+        setWarning(true);
+        setLoading(false);
+      });
+
+    // jsonp(myUrl.toString(), null, function (err, res) {
+    //   if (err) {
+    //     setWarning(true);
+    //     setLoading(false);
+    //     return;
+    //   } else {
+    //     setPackageNLGData({
+    //       Scale: res.result.Scale,
+    //       Nativity: res.result.Nativity,
+    //       Gender: res.result.Gender,
+    //       Race_and_Ethnicity: res.result["Available by Race and Ethnicity"],
+    //       Age_Group: res.result["Age Group"],
+    //       Title: res.result.title.split("(")[0],
+    //     });
+    //     setPackageDisplayData({
+    //       title: res.result.title,
+    //       name: res.result.name,
+    //       notes: res.result.notes,
+    //     });
+    //     setTitle(res.result.title);
+    //     setRows(res.result.resources);
+    //     setLoading(false);
+    //   }
+    // });
   };
   if (resourceMode) {
     return (
@@ -169,7 +198,7 @@ function PackagePage(params) {
       <div style={{margin:"8px",display:"block",textAlign:"center"}}>
         <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
           <Alert onClose={closeWarning} severity="error">
-            Please enter correct package id
+            Unable to fetch ckan dataset for given id
           </Alert>
         </Snackbar>
         <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>

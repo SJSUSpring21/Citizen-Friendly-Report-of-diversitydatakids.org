@@ -6,8 +6,11 @@
 }
 
 .grid-header{
-  background-color: palegreen;
-  font-weight:bold;
+  background-color:lightsalmon;
+  font-weight:700;
   font-family: "Arial Black", Arial, sans-serif;
+}
+.MuiDataGrid-root .MuiDataGrid-colCellTitle{
+  font-weight: 700 !important;
 }
 * {-webkit-font-smoothing: antialiased;}
