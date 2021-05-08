@@ -523,20 +523,23 @@ function ResourcePage(props) {
   };
   return (
     <div className="App">
-      <div id="title" style={{ marginLeft:"48px", display: "flex" }}>
+      <div id="title" style={{ marginLeft: "48px", display: "flex" }}>
         <Autocomplete
           id="combo-box-demo"
           options={name_filter}
           getOptionLabel={(option) => option}
           style={{ width: 300 }}
           value={name}
+          disabled={name_filter.length > 0 ? false : true}
           onChange={(event, newValue) => {
             handleChangeNameFilter(newValue);
           }}
           onInputChange={(event, newInputValue) => {
             onFilterTextChange(newInputValue);
           }}
-          renderInput={(params) => <TextField {...params} label="Select Region" />}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Region" />
+          )}
         />
         <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
           {displayData.title}
@@ -547,7 +550,7 @@ function ResourcePage(props) {
           Unable to fectch data
         </Alert>
       </Snackbar>
-      <div style={{marginTop:"8px"}}>
+      <div style={{ marginTop: "8px" }}>
         <ReactDataGrid
           idProperty="_id"
           minRowHeight="100"
@@ -602,7 +605,7 @@ function ResourcePage(props) {
                 maxWidth="sm"
                 className={chart == "pie" ? "pie" : "bar"}
               >
-                {chart == "bar" && (
+                {chart == "bar" && graphState.length > 0 && (
                   <BarChart
                     width={500}
                     height={200}
