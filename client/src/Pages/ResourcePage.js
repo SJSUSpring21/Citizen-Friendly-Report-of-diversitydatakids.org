@@ -76,6 +76,7 @@ function ResourcePage(props) {
 
   useEffect(() => {
     fetchFilterData();
+    fetchCkanData();
     fetchStats();
   }, [props]);
 
@@ -111,12 +112,20 @@ function ResourcePage(props) {
   };
 
   const createUrl = (filter) => {
-    const base =
-      "https://data.diversitydatakids.org/api/3/action/datastore_search";
-    myUrl = new URL(base);
-    myUrl.searchParams.append("limit", pageSize);
-    myUrl.searchParams.append("resource_id", resourceId);
-    myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
+    if (filter) {
+      const base =
+        "https://data.diversitydatakids.org/api/3/action/datastore_search";
+      myUrl = new URL(base);
+      myUrl.searchParams.append("limit", pageSize);
+      myUrl.searchParams.append("resource_id", resourceId);
+      myUrl.searchParams.append("filters", '{ "name": "' + filter + '"}');
+    } else {
+      const base =
+        "https://data.diversitydatakids.org/api/3/action/datastore_search";
+      myUrl = new URL(base);
+      myUrl.searchParams.append("limit", pageSize);
+      myUrl.searchParams.append("resource_id", resourceId);
+    }
   };
 
   const fetchFilterData = (filter) => {
@@ -125,9 +134,11 @@ function ResourcePage(props) {
       return;
     }
     createUrlFilters(filter);
-    setLoading(true);
+
     jsonp(myUrl.toString(), null, function (err, res) {
       if (err) {
+        console.log("error");
+        // fetchCkanData();
         setLoading(false);
         return;
       } else {
@@ -135,6 +146,7 @@ function ResourcePage(props) {
           return record.name;
         });
         if (filter == undefined) {
+          console.log(filter);
           fetchRegionalStats(name_filter[0]);
           setName(name_filter[0]);
           fetchCkanData(name_filter[0]);
@@ -321,6 +333,7 @@ function ResourcePage(props) {
   };
 
   const fetchCkanData = (filter) => {
+    console.log("inside fetch data");
     if (resourceId === "") {
       setWarning(true);
       return;
@@ -377,6 +390,7 @@ function ResourcePage(props) {
             })
         );
         setVisibleData(columnMap);
+        console.log("column map", columnMap);
         setColumnMap(columnMap);
         setRows(res.result.records);
         setLoading(false);
@@ -424,6 +438,7 @@ function ResourcePage(props) {
 
   const onSelectionChange = useCallback(
     ({ selected: selectedMap, data }) => {
+      console.log("selection");
       setRowData(data[0]);
       for (const [key, value] of Object.entries(infoMap)) {
         value.data = data[0][key];
@@ -447,7 +462,12 @@ function ResourcePage(props) {
             let graphData = [];
             for (var key of Object.keys(data[0])) {
               if (key.includes("_est") && !key.includes("total_est")) {
-                graphData.push({ key: key, ethnicity: data[0][key] });
+                console.log(columnMap[key].title);
+
+                graphData.push({
+                  key: columnMap[key].title,
+                  ethnicity: data[0][key],
+                });
               }
             }
             setGraphState(graphData);
@@ -574,57 +594,8 @@ function ResourcePage(props) {
             </div>
           )}
 
-          {message.length && (
+          {message.length > 0 && (
             <React.Fragment>
-              <div className={classes.root}>
-                {chart == "bar" && (
-                  <ButtonGroup
-                    color="primary"
-                    aria-label="outlined primary button group"
-                  >
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => {
-                        showBarChart();
-                      }}
-                    >
-                      Bar
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        showPieChart();
-                      }}
-                    >
-                      Pie
-                    </Button>
-                  </ButtonGroup>
-                )}
-                {chart == "pie" && (
-                  <ButtonGroup
-                    color="primary"
-                    aria-label="outlined primary button group"
-                  >
-                    <Button
-                      onClick={() => {
-                        showBarChart();
-                      }}
-                    >
-                      Bar
-                    </Button>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => {
-                        showPieChart();
-                      }}
-                    >
-                      Pie
-                    </Button>
-                  </ButtonGroup>
-                )}
-              </div>
-
               <CssBaseline />
 
               <Container
@@ -650,24 +621,6 @@ function ResourcePage(props) {
                     <Legend />
                     <Bar dataKey="ethnicity" fill="#8884d8" />
                   </BarChart>
-                )}
-                {chart == "pie" && (
-                  <PieChart width={500} height={250}>
-                    <Pie
-                      isAnimationActive={false}
-                      dataKey="ethnicity"
-                      startAngle={180}
-                      endAngle={0}
-                      data={graphState}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    />
-
-                    <Tooltip content={<CustomTooltip />} />
-                  </PieChart>
                 )}
               </Container>
             </React.Fragment>
