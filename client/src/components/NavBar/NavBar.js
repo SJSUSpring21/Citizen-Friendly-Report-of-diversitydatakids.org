@@ -16,6 +16,8 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   title: {
+    textAlign: "center",
+    marginRight: "128px",
     flexGrow: 1,
   },
 }));
@@ -28,7 +30,7 @@ export default function NavBar() {
       <AppBar position="static">
         
         <Toolbar>
-        <Link to="/" style={{color:"white", marginRight:"32px"}}> Home</Link>
+        <Link to="/" style={{color:"white", marginRight:"32px", textDecoration:"none", fontSize:"x-large"}}> Home</Link>
           <Typography variant="h6" className={classes.title}>
             Citizen Friendly Report of diversitydatakids.org
           </Typography>

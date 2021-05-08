@@ -17,4 +17,7 @@
   background-color:lightsalmon;
   color:black;
 }
+.MuiToolbar-regular{
+  min-height: 48px !important;
+}
 * {-webkit-font-smoothing: antialiased;}
