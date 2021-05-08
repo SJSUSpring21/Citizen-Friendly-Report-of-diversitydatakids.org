@@ -200,7 +200,7 @@ function PackagePage(params) {
             Unable to fetch ckan dataset for given id
           </Alert>
         </Snackbar>
-        <Typography variant="h6" gutterBottom style={{ margin: "auto" }}>
+        <Typography variant="h6" gutterBottom style={{ margin: "auto" }} className = "Headings">
           {"Available Regional datasets for- "+title}
         </Typography>
       </div>

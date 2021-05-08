@@ -70,7 +70,7 @@ function SearchPage() {
   const columns = [
     {
       field: "title",
-      headerName: "Dataset Name",
+      headerName: "Topics",
       headerClassName: "grid-header",
       flex: 300,
       renderCell: (params) => {
@@ -100,7 +100,7 @@ function SearchPage() {
     },
     {
       field: "notes",
-      headerName: "Dataset Description",
+      headerName: "Topic Details",
       headerClassName: "grid-header",
       flex: 400,
       renderCell: (params) => {
@@ -124,6 +124,7 @@ function SearchPage() {
       field: "id",
       headerName: "id",
       width: 500,
+      headerClassName: "grid-header",
       hide: true,
     },
   ];
@@ -166,8 +167,8 @@ function SearchPage() {
   return (
     <div style={{ display: "flex" }}>
       <div style={{width:"250px"}}>
-        <Typography variant="subtitle2" style={{margin:"16px",marginBottom:"0px",fontWeight:"700"}}>
-          Available Subtopics
+        <Typography variant="subtitle2" style={{margin:"16px",marginBottom:"0px",fontWeight:"700"}} className = "Headings">
+          Available Categories
         </Typography>
         <Divider />
         <List component="nav" aria-label="Sub Topics" dense={true} style={{ height: "550px", overflow: "auto" }}>
