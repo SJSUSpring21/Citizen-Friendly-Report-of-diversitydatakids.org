@@ -595,10 +595,10 @@ function ResourcePage(props) {
           {supported && message !== "" && (
             <div>
               <Typography variant="h6" gutterBottom className = "Headings">
-                Seldcted Record data:
+                Selected Record data:
               </Typography>
               <Typography variant="body2" gutterBottom>
-                {message}
+                {message.replace("<p>", "").replace("</p>")}
               </Typography>
             </div>
           )}
