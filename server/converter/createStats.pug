@@ -4,6 +4,8 @@ include synonyms
 mixin percent 
     if(NLG.Scale[0] === 'Percent')
         |%
+    if(NLG.Scale[0]=== 'Dollar')
+        |$
 
 mixin yearCount
     | #{Number(yearFormat.split("-")[0]) > 1 ? "5 Years" : "1 Year"}

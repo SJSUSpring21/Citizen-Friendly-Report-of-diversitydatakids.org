@@ -3,6 +3,8 @@ include synonyms
 mixin percent 
     if(NLG.Scale[0] === 'Percent')
         |%
+    if(NLG.Scale[0]=== 'Dollar')
+        |$
 
 p
     | In #{filter}, #[+Average] #{NLG.Scale[0]} of #{NLG.Title} is #{parseFloat(total).toFixed(2)} #[+percent] 

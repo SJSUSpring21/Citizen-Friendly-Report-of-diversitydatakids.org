@@ -4,11 +4,10 @@ import React, { useEffect, useState } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import jsonp from "jsonp";
 import Container from "@material-ui/core/Container";
-import { Button, Snackbar, Typography } from "@material-ui/core";
+import {Snackbar, Typography } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import "./ResourcePage.css";
 import Spinner from "react-bootstrap/Spinner";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -229,6 +228,8 @@ function ResourcePage(props) {
           fetchStatistics();
           fetchEthnicStats(titles, query);
         } else {
+          setSupported(false);
+          setMessage("*NLG is not supported for this dataset");
           setLoadingStats(false);
         }
       }
@@ -450,6 +451,18 @@ function ResourcePage(props) {
         value.data = data[0][key];
         visibleMap[key] = value;
       }
+      {
+        let graphData = [];
+        for (var key of Object.keys(data[0])) {
+          if (key.includes("_est") && !key.includes("total_est")) {
+            graphData.push({
+              key: columnMap[key].title,
+              ethnicity: data[0][key],
+            });
+          }
+        }
+        setGraphState(graphData);
+      }
       setVisibleMap(visibleMap);
       if (supported) {
         Axios.post(endPointObj.url + "getRowText", {
@@ -460,25 +473,13 @@ function ResourcePage(props) {
           resourceName: resourceName,
         })
           .then((result) => {
-            let graphData = [];
-            for (var key of Object.keys(data[0])) {
-              if (key.includes("_est") && !key.includes("total_est")) {
-                console.log(columnMap[key].title);
-
-                graphData.push({
-                  key: columnMap[key].title,
-                  ethnicity: data[0][key],
-                });
-              }
-            }
-            setGraphState(graphData);
             setMessage(result.data);
           })
           .catch((error) => {
             setMessage("");
           });
       } else {
-        setMessage("NLG is not supported for this dataset");
+        setMessage("*NLG is not supported for this dataset");
       }
     },
     [supported, NLGData, infoMap, visibleMap, stats, resourceName]
@@ -542,7 +543,11 @@ function ResourcePage(props) {
             <TextField {...params} label="Select Region" />
           )}
         />
-        <Typography variant="h6" gutterBottom style={{ margin: "auto", marginLeft:"32px"}}>
+        <Typography
+          variant="h6"
+          gutterBottom
+          style={{ margin: "auto", marginLeft: "32px" }}
+        >
           {displayData.title}
         </Typography>
       </div>
@@ -591,12 +596,23 @@ function ResourcePage(props) {
                 Selcted Record data:
               </Typography>
               <Typography variant="body2" gutterBottom>
-                {message.replace("<p>", "").replace("</p>", "")}
+                {message}
+              </Typography>
+            </div>
+          )}
+          {!supported && message !== "" && (
+            <div>
+              <Typography
+                variant="body2"
+                gutterBottom
+                style={{ fontWeight: "700" , color:"red"}}
+              >
+                {message}
               </Typography>
             </div>
           )}
 
-          {message.length > 0 && (
+          {
             <React.Fragment>
               <CssBaseline />
 
@@ -626,7 +642,7 @@ function ResourcePage(props) {
                 )}
               </Container>
             </React.Fragment>
-          )}
+          }
         </div>
 
         {supported && !loadingStats && (

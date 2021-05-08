@@ -58,9 +58,7 @@ function PackagePage(params) {
     {
       field: "name",
       headerName: "Region",
-      // valueFormatter: (params) => {
-      //   return (params.value.split("(")[0]);
-      // },
+      flex: 50,
       width: 500,
       headerClassName: "grid-header",
       renderCell: (params) => {
@@ -77,6 +75,7 @@ function PackagePage(params) {
       headerName: "Year info",
       headerClassName: "grid-header",
       width: 150,
+      flex: 50,
     },
   ];
   const [warning, setWarning] = useState(false);

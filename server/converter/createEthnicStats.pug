@@ -3,6 +3,8 @@ include synonyms
 mixin percent 
     if(NLG.Scale[0] === 'Percent')
         |%
+    if(NLG.Scale[0]=== 'Dollar')
+        |$
 
 p
     //- | the overall #[+Average] for #[+each] #[+race] is #[+around] #{parseFloat(avg).toFixed(2)}. 
