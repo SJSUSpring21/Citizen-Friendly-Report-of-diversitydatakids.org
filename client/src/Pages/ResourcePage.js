@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import jsonp from "jsonp";
 import Container from "@material-ui/core/Container";
-import {Snackbar, Typography } from "@material-ui/core";
+import { Snackbar, Typography } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
@@ -373,7 +373,7 @@ function ResourcePage(props) {
                       .split(";")[1]
                       .replace("Census", ""),
                     minWidth: 50,
-                    width:175,
+                    width: 175,
                   };
                 } else {
                   columnMap[field.id] = {
@@ -384,7 +384,7 @@ function ResourcePage(props) {
                     name: field.id,
                     header: field.info.label.replace("Census", ""),
                     minWidth: 50,
-                    width:175,
+                    width: 175,
                   };
                 }
               } else {
@@ -459,7 +459,7 @@ function ResourcePage(props) {
           if (key.includes("_est") && !key.includes("total_est")) {
             graphData.push({
               key: columnMap[key].title,
-              ethnicity: data[0][key],
+              value: data[0][key],
             });
           }
         }
@@ -549,7 +549,7 @@ function ResourcePage(props) {
           variant="h6"
           gutterBottom
           style={{ margin: "auto", marginLeft: "32px" }}
-          className = "Headings"
+          className="Headings"
         >
           {displayData.title}
         </Typography>
@@ -594,11 +594,11 @@ function ResourcePage(props) {
         <div style={{ margin: "8px" }}>
           {supported && message !== "" && (
             <div>
-              <Typography variant="h6" gutterBottom className = "Headings">
+              <Typography variant="h6" gutterBottom className="Headings">
                 Selected Record data:
               </Typography>
               <Typography variant="body2" gutterBottom>
-                {message.replace("<p>", "").replace("</p>")}
+                {message.replace("<p>", "").replace("</p>", "")}
               </Typography>
             </div>
           )}
@@ -607,7 +607,7 @@ function ResourcePage(props) {
               <Typography
                 variant="body2"
                 gutterBottom
-                style={{ fontWeight: "700" , color:"red"}}
+                style={{ fontWeight: "700", color: "red" }}
               >
                 {message}
               </Typography>
@@ -639,7 +639,7 @@ function ResourcePage(props) {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="ethnicity" fill="#8884d8" />
+                    <Bar dataKey="value" fill="#8884d8" />
                   </BarChart>
                 )}
               </Container>
@@ -659,7 +659,7 @@ function ResourcePage(props) {
               </Typography>
             </div>
             <div id="regional">
-              <Typography variant="h6" gutterBottom className = "Headings">
+              <Typography variant="h6" gutterBottom className="Headings">
                 Geographic Data:
               </Typography>
               <Typography variant="body2" gutterBottom>
