@@ -72,6 +72,7 @@ function ResourcePage(props) {
   const [overview, setOverview] = useState("");
   const [ethnicStats, setEthnicStats] = useState("");
   const [regionalStats, setRegionalStats] = useState("");
+  const [dispRegional, setdispRegional] = useState(false);
   let myUrl = "";
 
   useEffect(() => {
@@ -271,6 +272,12 @@ function ResourcePage(props) {
     let titles = {};
     url.searchParams.append("limit", 0);
     url.searchParams.append("resource_id", resourceId);
+    if(filter === "" || filter ===null){
+      setdispRegional(false);
+      return
+    }else{
+      setdispRegional(true);
+    }
     jsonp(url.toString(), null, function (err, res) {
       if (err) {
         setWarning(true);
@@ -658,14 +665,14 @@ function ResourcePage(props) {
                 {ethnicStats.replace("<p>", "").replace("</p>", "")}
               </Typography>
             </div>
-            <div id="regional">
+           {dispRegional && <div id="regional">
               <Typography variant="h6" gutterBottom className = "Headings">
                 Geographic Data:
               </Typography>
               <Typography variant="body2" gutterBottom>
                 {regionalStats.replace("<p>", "").replace("</p>", "")}
               </Typography>
-            </div>
+            </div>}
 
             {/* <div>{message.replace("<p>", "").replace("</p>", "")}</div> */}
           </div>
