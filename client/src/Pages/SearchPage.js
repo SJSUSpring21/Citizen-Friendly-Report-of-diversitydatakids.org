@@ -2,13 +2,19 @@ import { useEffect, useState } from "react";
 import { DataGrid } from "@material-ui/data-grid";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 import {
   IconButton,
   InputBase,
   Paper,
   Snackbar,
   Tooltip,
+  Typography,
 } from "@material-ui/core";
+import Divider from '@material-ui/core/Divider';
 import Alert from "@material-ui/lab/Alert";
 import Axios from "axios";
 import { Link } from "react-router-dom";
@@ -29,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     width: "auto",
-    margin: "8px 240px",
+    margin: "16px 32px",
   },
   input: {
     marginLeft: theme.spacing(1),
@@ -60,6 +66,7 @@ function SearchPage() {
   const [rows, setRows] = useState([]);
   const [input, setInput] = useState("");
   const [isSelected, setIsSelected] = useState(false);
+  const [subTopics, setSubTopics] = useState({});
   const columns = [
     {
       field: "title",
@@ -68,15 +75,21 @@ function SearchPage() {
       flex: 300,
       renderCell: (params) => {
         return (
-          <div style={{ textOverflow: "ellipsis",
-          whiteSpace: "initial",
-          lineHeight: "normal",
-          maxHeight: "48px",}}>
-            <Link
-              style={{textOverflow: "ellipsis",
+          <div
+            style={{
+              textOverflow: "ellipsis",
               whiteSpace: "initial",
               lineHeight: "normal",
-              maxHeight: "48px",}}
+              maxHeight: "48px",
+            }}
+          >
+            <Link
+              style={{
+                textOverflow: "ellipsis",
+                whiteSpace: "initial",
+                lineHeight: "normal",
+                maxHeight: "48px",
+              }}
               to={"/packages?id=" + params.getValue("id")}
               target="_blank"
             >
@@ -93,10 +106,6 @@ function SearchPage() {
       flex: 400,
       renderCell: (params) => {
         return (
-          // <BootstrapTooltip
-          //   title={params.value}
-          //   style={{ overflow: "hidden", Width: "95%" }}
-          // >
           <span
             className="table-cell-trucate"
             style={{
@@ -129,10 +138,11 @@ function SearchPage() {
   };
 
   useEffect(() => {
-    fetchCkanData();
-  }, []);
+    fetchCkanData("");
+    fetchSubTopics();
+  },[]);
 
-  const fetchCkanData = () => {
+  const fetchCkanData = (input) => {
     setLoading(true);
     Axios.post("http://localhost:5000/search", {
       input: input,
@@ -146,66 +156,93 @@ function SearchPage() {
       });
   };
   const fetchSubTopics = () => {
-    jsonp("https://data.diversitydatakids.org/api/3/action/package_search?fq=&facet.field=[%22vocab_Subtopic%22]&rows=0", null, function (err, res) {
-
-    });
+    Axios.post("http://localhost:5000/subtopics", {
+      input: input,
+    })
+      .then((result) => {
+        setSubTopics(result.data.result.facets.vocab_Subtopic);
+      })
+      .catch((err) => {});
   };
-  const preventDefault = (event) => event.preventDefault();
   return (
-    <div className="App">
-      <Paper component="form" className={classes.root}>
-        <InputBase
-          type="input"
-          className={classes.input}
-          placeholder="Search Datasets..."
-          inputProps={{ "aria-label": "search datasets" }}
-          onChange={(e) => {
-            setInput(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              fetchCkanData();
-            }
-          }}
-        />
-        <IconButton
-          className={classes.iconButton}
-          aria-label="search"
-          onClick={(e) => {
-            console.log(e);
-            fetchCkanData();
-          }}
-        >
-          <SearchIcon />
-        </IconButton>
-      </Paper>
-      <div style={{ margin: "8px" }}>
-        <Snackbar open={warning} autoHideDuration={6000} onClose={closeWarning}>
-          <Alert onClose={closeWarning} severity="error">
-            Unable to fetch data
-          </Alert>
-        </Snackbar>
+    <div style={{ display: "flex" }}>
+      <div style={{width:"250px"}}>
+        <Typography variant="subtitle2" style={{margin:"16px",marginBottom:"0px",fontWeight:"700"}}>
+          Pick a Subtopic
+        </Typography>
+        <Divider />
+        <List component="nav" aria-label="Sub Topics" dense={true} style={{ height: "550px", overflow: "auto" }}>
+          {Object.keys(subTopics).map((each,id) => {
+            return (
+              <ListItem key={id} button onClick={(e)=>{
+                setInput(e.target.innerText)
+                fetchCkanData(e.target.innerText);
+              }} >
+                <ListItemText primary={each} />
+              </ListItem>
+            );
+          })}
+        </List>
       </div>
-      <div style={{ height:"500px", width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          getRowId={(row) => row.id}
-          pageSize={20}
-          autoHeight= {false}
-          onRowSelected={(e) => {
-            setRowData(e.data);
-            setIsSelected(e.isSelected);
-          }}
-        />
-      </div>
-      {/* <div style={{margin:"16px",display:"flex"}} >
+      <div style={{ width: "100%" }}>
+        <Paper component="form" className={classes.root}>
+          <InputBase
+            type="input"
+            className={classes.input}
+            placeholder="Search Datasets..."
+            inputProps={{ "aria-label": "search datasets" }}
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                fetchCkanData(input);
+              }
+            }}
+          />
+          <IconButton
+            className={classes.iconButton}
+            aria-label="search"
+            onClick={(e) => {
+              fetchCkanData(input);
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </Paper>
+        <div style={{ margin: "8px" }}>
+          <Snackbar
+            open={warning}
+            autoHideDuration={6000}
+            onClose={closeWarning}
+          >
+            <Alert onClose={closeWarning} severity="error">
+              Unable to fetch data
+            </Alert>
+          </Snackbar>
+        </div>
+        <div style={{ height: "500px", width: "100%" }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            getRowId={(row) => row.id}
+            pageSize={20}
+            autoHeight={false}
+            onRowSelected={(e) => {
+              setRowData(e.data);
+              setIsSelected(e.isSelected);
+            }}
+          />
+        </div>
+        {/* <div style={{margin:"16px",display:"flex"}} >
       {isSelected && <Link style={{marginLeft:"auto"}} to={"/packages?id=" + rowData.id } >
           Show Geographic datasets
         </Link>}
       </div> */}
+      </div>
     </div>
   );
 }
