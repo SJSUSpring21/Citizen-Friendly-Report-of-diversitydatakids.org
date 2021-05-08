@@ -6,7 +6,11 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import headerImage from "../resources/diversityImage.PNG";
+import bgImage from "../resources/bgImage.PNG";
+import "./SearchPage.css";
 import {
+  Hidden,
   IconButton,
   InputBase,
   Paper,
@@ -14,11 +18,14 @@ import {
   Tooltip,
   Typography,
 } from "@material-ui/core";
-import Divider from '@material-ui/core/Divider';
+import Divider from "@material-ui/core/Divider";
 import Alert from "@material-ui/lab/Alert";
 import Axios from "axios";
 import { Link } from "react-router-dom";
 import jsonp from "jsonp";
+import Modal from "@material-ui/core/Modal";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
 
 const useStylesBootstrap = makeStyles((theme) => ({
   arrow: {
@@ -46,6 +53,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const useStylesModal = makeStyles((theme) => ({
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    width: "70vw",
+    height: "40vw",
+    overflow: "Hidden",
+  },
+}));
+
 const LightTooltip = withStyles((theme) => ({
   tooltip: {
     backgroundColor: theme.palette.common.white,
@@ -61,6 +85,7 @@ function BootstrapTooltip(props) {
   return <Tooltip arrow classes={classes} {...props} />;
 }
 function SearchPage() {
+  const classesModal = useStylesModal();
   const classes = useStyles();
   const [rowData, setRowData] = useState({});
   const [rows, setRows] = useState([]);
@@ -129,6 +154,8 @@ function SearchPage() {
   ];
   const [warning, setWarning] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const closeWarning = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -136,10 +163,19 @@ function SearchPage() {
     setWarning(false);
   };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   useEffect(() => {
+    if (sessionStorage.getItem("modalOpen") !== "true") {
+      setOpen(true);
+      sessionStorage.setItem("modalOpen", true);
+    }
+
     fetchCkanData("");
     fetchSubTopics();
-  },[]);
+  }, []);
 
   const fetchCkanData = (input) => {
     setLoading(true);
@@ -165,18 +201,30 @@ function SearchPage() {
   };
   return (
     <div style={{ display: "flex" }}>
-      <div style={{width:"250px"}}>
-        <Typography variant="subtitle2" style={{margin:"16px",marginBottom:"0px",fontWeight:"700"}}>
+      <div style={{ width: "250px" }}>
+        <Typography
+          variant="subtitle2"
+          style={{ margin: "16px", marginBottom: "0px", fontWeight: "700" }}
+        >
           Available Subtopics
         </Typography>
         <Divider />
-        <List component="nav" aria-label="Sub Topics" dense={true} style={{ height: "550px", overflow: "auto" }}>
-          {Object.keys(subTopics).map((each,id) => {
+        <List
+          component="nav"
+          aria-label="Sub Topics"
+          dense={true}
+          style={{ height: "550px", overflow: "auto" }}
+        >
+          {Object.keys(subTopics).map((each, id) => {
             return (
-              <ListItem key={id} button onClick={(e)=>{
-                setInput(e.target.innerText)
-                fetchCkanData(e.target.innerText);
-              }} >
+              <ListItem
+                key={id}
+                button
+                onClick={(e) => {
+                  setInput(e.target.innerText);
+                  fetchCkanData(e.target.innerText);
+                }}
+              >
                 <ListItemText primary={each} />
               </ListItem>
             );
@@ -242,6 +290,33 @@ function SearchPage() {
         </Link>}
       </div> */}
       </div>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        className={classesModal.modal}
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={open}>
+          <div className={classesModal.paper}>
+            <img src={headerImage} />
+            <div className="row">
+              <div className="col-sm-8">
+                <img src={bgImage} className="body-image" />
+              </div>
+              <div className="col-sm-4 font-style">
+                Welcome to data diversity kids website we have over 320 datasets
+                to browse through{" "}
+              </div>
+            </div>
+          </div>
+        </Fade>
+      </Modal>
     </div>
   );
 }
