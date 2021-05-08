@@ -372,7 +372,7 @@ function ResourcePage(props) {
                     header: field.info.label
                       .split(";")[1]
                       .replace("Census", ""),
-                    minWidth: 200,
+                    minWidth: 50,
                   };
                 } else {
                   columnMap[field.id] = {
@@ -382,7 +382,7 @@ function ResourcePage(props) {
                   return {
                     name: field.id,
                     header: field.info.label.replace("Census", ""),
-                    minWidth: 200,
+                    minWidth: 50,
                   };
                 }
               } else {
@@ -559,7 +559,6 @@ function ResourcePage(props) {
       <div style={{ marginTop: "8px" }}>
         <ReactDataGrid
           idProperty="_id"
-          minRowHeight="100"
           columns={columns}
           dataSource={rows}
           style={gridStyle}

@@ -13,4 +13,8 @@
 .MuiDataGrid-root .MuiDataGrid-colCellTitle{
   font-weight: 700 !important;
 }
+.InovuaReactDataGrid__column-header{
+  background-color:lightsalmon;
+  color:black;
+}
 * {-webkit-font-smoothing: antialiased;}

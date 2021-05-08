@@ -13,9 +13,11 @@ import "@fontsource/roboto";
 function App() {
   return (
     <>
-      <NavigationBar />
-      <Router>
+    
+    <Router>
+    <NavigationBar />
         <Switch>
+        
           <Route path="/delete" exact component={Dashboard} />
           <Route path="/packages" exact component={PackagePage} />
           <Route path="/" exact component={SearchPage} />

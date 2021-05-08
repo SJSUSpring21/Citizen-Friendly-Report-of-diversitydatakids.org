@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +26,9 @@ export default function NavBar() {
   return (
     <div className={classes.root}>
       <AppBar position="static">
+        
         <Toolbar>
+        <Link to="/" style={{color:"white", marginRight:"32px"}}> Home</Link>
           <Typography variant="h6" className={classes.title}>
             Citizen Friendly Report of diversitydatakids.org
           </Typography>

@@ -210,7 +210,7 @@ function PackagePage(params) {
           columns={columns}
           loading={loading}
           getRowId={(row) => row.id}
-          pageSize={10}
+          pageSize={20}
           onRowSelected={(rowData) => {
             setRowData(rowData);
           }}

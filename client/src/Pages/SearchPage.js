@@ -91,7 +91,6 @@ function SearchPage() {
                 maxHeight: "48px",
               }}
               to={"/packages?id=" + params.getValue("id")}
-              target="_blank"
             >
               {params.value}
             </Link>
@@ -168,7 +167,7 @@ function SearchPage() {
     <div style={{ display: "flex" }}>
       <div style={{width:"250px"}}>
         <Typography variant="subtitle2" style={{margin:"16px",marginBottom:"0px",fontWeight:"700"}}>
-          Pick a Subtopic
+          Available Subtopics
         </Typography>
         <Divider />
         <List component="nav" aria-label="Sub Topics" dense={true} style={{ height: "550px", overflow: "auto" }}>
