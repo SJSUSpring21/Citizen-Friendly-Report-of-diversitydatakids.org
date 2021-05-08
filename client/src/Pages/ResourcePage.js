@@ -12,6 +12,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import "./ResourcePage.css";
 import Spinner from "react-bootstrap/Spinner";
 import "bootstrap/dist/css/bootstrap.min.css";
+import endPointObj from "../endPointUrl";
 import {
   BarChart,
   Bar,
@@ -169,7 +170,7 @@ function ResourcePage(props) {
         let data = res.result.records[0];
         if (data && res.success) {
           setStats({ min: data.min, max: data.max, avg: data.avg });
-          Axios.post("http://localhost:5000/getOverview", {
+          Axios.post(endPointObj.url + "getOverview", {
             NLGData: NLGData,
             stats: { min: data.min, max: data.max, avg: data.avg },
             resourceName: resourceName,
@@ -248,7 +249,7 @@ function ResourcePage(props) {
         if (res.success) {
           let data = res.result.records[0];
           Object.keys(data).length > 1 &&
-            Axios.post("http://localhost:5000/getEthnicStats", {
+            Axios.post(endPointObj.url + "getEthnicStats", {
               NLGData: NLGData,
               data: data,
               titles: titles,
@@ -314,7 +315,7 @@ function ResourcePage(props) {
             } else {
               if (res.success) {
                 let data = res.result.records[0];
-                Axios.post("http://localhost:5000/getRegionalStats", {
+                Axios.post(endPointObj.url + "getRegionalStats", {
                   NLGData: NLGData,
                   data: data,
                   titles: titles,
@@ -451,7 +452,7 @@ function ResourcePage(props) {
       }
       setVisibleMap(visibleMap);
       if (supported) {
-        Axios.post("http://localhost:5000/getRowText", {
+        Axios.post(endPointObj.url + "getRowText", {
           NLGData: NLGData,
           info: infoMap,
           data: visibleMap,
@@ -568,22 +569,20 @@ function ResourcePage(props) {
           // limit={pageSize}
         />
       </div>
-      <div id="loadingNLG" style={{ display: "block" , textAlign:"center" }}>
-          {(
-            loadingStats && <div style={{ marginTop:"32px" }}>
-              <Spinner
-                as="span"
-                animation="grow"
-                size="m"
-                role="status"
-                aria-hidden="true"
-              />
-              <div style={{ }}>
-                Generating Natural Language...
-              </div>
-            </div>
-          )}
-        </div>
+      <div id="loadingNLG" style={{ display: "block", textAlign: "center" }}>
+        {loadingStats && (
+          <div style={{ marginTop: "32px" }}>
+            <Spinner
+              as="span"
+              animation="grow"
+              size="m"
+              role="status"
+              aria-hidden="true"
+            />
+            <div style={{}}>Generating Natural Language...</div>
+          </div>
+        )}
+      </div>
       <div style={{ display: "flex" }}>
         <div style={{ margin: "8px" }}>
           {supported && message !== "" && (
@@ -629,7 +628,7 @@ function ResourcePage(props) {
             </React.Fragment>
           )}
         </div>
-        
+
         {supported && !loadingStats && (
           <div style={{ margin: "8px" }}>
             <div id="overview">
