@@ -319,14 +319,8 @@ function SearchPage() {
                 <img src={bgImage} className="body-image" />
               </div>
               <div className="col-sm-4 font-style">
-                Understanding the conditions children experience is the first
-                step toward ensuring that all children have equitable access to
-                the resources they need to thrive. diversitydatakids.org is a
-                research project that examines who our children are, whether
-                they have what they need to grow up healthy and achieve their
-                full potential, whether social policies are well designed to
-                improve children’s lives and how to make them better to improve
-                equity.{" "}
+                Welcome to data diversity kids website we have over 6000
+                datasets and 324 topics available to browse through.{" "}
               </div>
             </div>
           </div>
