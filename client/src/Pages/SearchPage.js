@@ -202,12 +202,13 @@ function SearchPage() {
   };
   return (
     <div style={{ display: "flex" }}>
-
-
-      <div style={{width:"250px"}}>
-        <Typography variant="subtitle2" style={{margin:"16px",marginBottom:"0px",fontWeight:"700"}} className = "Headings">
+      <div style={{ width: "250px" }}>
+        <Typography
+          variant="subtitle2"
+          style={{ margin: "16px", marginBottom: "0px", fontWeight: "700" }}
+          className="Headings"
+        >
           Available Categories
-
         </Typography>
         <Divider />
         <List
@@ -305,14 +306,21 @@ function SearchPage() {
       >
         <Fade in={open}>
           <div className={classesModal.paper}>
-            <img src={headerImage} />
+            <div className="row">
+              <div className="col-sm-11">
+                <img src={headerImage} />
+              </div>
+              <div className="col-sm-1 close">
+                <b onClick={handleClose}>X</b>
+              </div>
+            </div>
             <div className="row">
               <div className="col-sm-8">
                 <img src={bgImage} className="body-image" />
               </div>
               <div className="col-sm-4 font-style">
-                Welcome to data diversity kids website we have over 320 datasets
-                to browse through{" "}
+                Welcome to data diversity kids website we have over 6000
+                datasets and 324 topics available to browse through.{" "}
               </div>
             </div>
           </div>
