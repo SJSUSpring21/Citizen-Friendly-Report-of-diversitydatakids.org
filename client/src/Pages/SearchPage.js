@@ -319,8 +319,15 @@ function SearchPage() {
                 <img src={bgImage} className="body-image" />
               </div>
               <div className="col-sm-4 font-style">
-                Welcome to data diversity kids website we have over 6000
-                datasets and 324 topics available to browse through.{" "}
+                &nbsp;&nbsp;&nbsp;&nbsp;Welcome to data diversity kids website
+                we have over 6000 datasets and 324 topics available to browse
+                through. <br /> &nbsp;&nbsp;&nbsp;&nbsp;We believe all children
+                deserve the opportunity to thrive. We also believe that when
+                opportunity is shared equitably, everyone benefits. For
+                children, opportunity includes the conditions and resources they
+                need to grow up healthy and learn. This includes the resources
+                available to their families, in the schools they attend and in
+                the neighborhoods where they live.
               </div>
             </div>
           </div>
