@@ -379,8 +379,7 @@ function ResourcePage(props) {
                     header: field.info.label
                       .split(";")[1]
                       .replace("Census", ""),
-                    minWidth: 50,
-                    width: 175,
+                    minWidth: 200,
                   };
                 } else {
                   columnMap[field.id] = {
@@ -390,8 +389,7 @@ function ResourcePage(props) {
                   return {
                     name: field.id,
                     header: field.info.label.replace("Census", ""),
-                    minWidth: 50,
-                    width: 175,
+                    minWidth: 200,
                   };
                 }
               } else {
