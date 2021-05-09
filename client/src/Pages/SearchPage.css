@@ -7,3 +7,8 @@
   font-style: italic;
   font-weight: bold;
 }
+
+.close {
+  text-align: right;
+  cursor: pointer;
+}
