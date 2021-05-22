@@ -1,4 +1,4 @@
 const endPointObj = {
-  url: "http://"+window.location.hostname+":5000/",
+  url: "http://3.211.4.134:5000/",
 };
 export default endPointObj;

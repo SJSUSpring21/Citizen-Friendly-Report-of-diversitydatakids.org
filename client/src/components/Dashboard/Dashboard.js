@@ -29,7 +29,7 @@ export default function SimpleContainer() {
 
   const getDisabilityChartData = () => {
     return new Promise((resolve, reject) => {
-      Axios.get("http://"+window.location.hostname+":5000/nationDisabilityChart/asian").then(
+      Axios.get("http://3.211.4.134:5000/nationDisabilityChart/asian").then(
         (result) => {
           resolve(result);
         }

@@ -32,7 +32,7 @@ export default function TextCard() {
 
   const getDisabilitytext = () => {
     return new Promise((resolve, reject) => {
-      Axios.get("http://"+window.location.hostname+":5000/nationDisabilityText/asian").then(
+      Axios.get("http://3.211.4.134:5000/nationDisabilityText/asian").then(
         (result) => {
           resolve(result);
         }

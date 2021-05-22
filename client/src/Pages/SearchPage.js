@@ -180,7 +180,7 @@ function SearchPage() {
 
   const fetchCkanData = (input) => {
     setLoading(true);
-    Axios.post("http://"+window.location.hostname+":5000/search", {
+    Axios.post("http://3.211.4.134:5000/search", {
       input: input,
     })
       .then((result) => {
@@ -192,7 +192,7 @@ function SearchPage() {
       });
   };
   const fetchSubTopics = () => {
-    Axios.post("http://"+window.location.hostname+":5000/subtopics", {
+    Axios.post("http://3.211.4.134:5000/subtopics", {
       input: input,
     })
       .then((result) => {
