@@ -1,4 +1,4 @@
 const endPointObj = {
-  url: "http://3.211.4.134:5000/",
+  url: "http://52.73.47.62:5000/",
 };
 export default endPointObj;
