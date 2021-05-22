@@ -106,7 +106,7 @@ function PackagePage(params) {
     }
     createUrl();
     setLoading(true);
-    Axios.post("http://localhost:5000/package", {
+    Axios.post("http://"+window.location.hostname+":5000/package", {
       id: id,
     })
       .then((result) => {
